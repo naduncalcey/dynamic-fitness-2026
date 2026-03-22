@@ -28,7 +28,7 @@ const CTA = () => {
           </p>
 
           <div className="mt-10">
-            <SpotlightButton variant="red">Book a Free Consultation</SpotlightButton>
+            <SpotlightButton variant="red" onClick={() => window.open("https://calendly.com/nadun-n-dynamicfitness/30min", "_blank")}>Book a Free Consultation</SpotlightButton>
           </div>
         </div>
       </div>

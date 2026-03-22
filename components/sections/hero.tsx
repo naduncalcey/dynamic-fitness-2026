@@ -62,7 +62,7 @@ const Hero = () => {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-red-500 font-serif italic font-normal">Dynamic Fitness</span>
             </h1>
             <div className="pt-[40px]">
-                <SpotlightButton>Book a Free Consultation</SpotlightButton>
+                <SpotlightButton onClick={() => window.open("https://calendly.com/nadun-n-dynamicfitness/30min", "_blank")}>Book a Free Consultation</SpotlightButton>
             </div>
         </div>
         <div className="container py-5 md:py-6 lg:!px-0 lg:border-t lg:border-x lg:border-white/20">

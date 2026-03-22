@@ -90,7 +90,7 @@ const Footer = () => {
 
         {/* CTA row */}
         <div className="mt-12 pt-8 border-t border-white/10">
-          <SpotlightButton>
+          <SpotlightButton onClick={() => window.open("https://calendly.com/nadun-n-dynamicfitness/30min", "_blank")}>
             <span className="flex items-center gap-3">
               <span className="text-red-400 text-xs tracking-[0.15em]">
                 START NOW //

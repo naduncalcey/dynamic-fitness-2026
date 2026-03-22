@@ -72,14 +72,14 @@ const About = () => {
               <br />
               <span className="text-white/50">Transformations</span>
             </h2>
-            <SpotlightButton className="mt-4">Set Route</SpotlightButton>
           </div>
           <div className="md:py-12">
-            <p className="text-base md:text-lg text-gray-400 leading-relaxed md:mb-12 max-w-md">
+            <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-md">
               Transform your workouts and redefine your limits at Dynamic
               Fitness, where innovation meets inspiration. Elevate your fitness
               game today and discover the dynamic difference
             </p>
+            <SpotlightButton className="mt-6" onClick={() => window.open("https://www.google.com/maps/dir//Dynamic+Fitness+(Pvt)+Ltd,+14+Sri+Devananda+Rd,+Maharagama+10280/@6.8523328,79.912721,16z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3ae25b00267d1985:0xc9c0845e8629e66b!2m2!1d79.9138617!2d6.8553051?entry=ttu&g_ep=EgoyMDI2MDMxOC4xIKXMDSoASAFQAw%3D%3D", "_blank")}>Set Route</SpotlightButton>
           </div>
         </div>
 
