@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import SpotlightButton from "../ui/spotlight-button";
 
