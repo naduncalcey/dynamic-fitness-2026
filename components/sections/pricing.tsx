@@ -113,26 +113,27 @@ const Pricing = () => {
     <section id="pricing" className="w-full border-t border-white/20 scroll-mt-20">
       {/* Section Intro */}
       <div className="container lg:border-x lg:border-white/20 pt-[60px] md:pt-[80px] lg:pt-[100px] pb-12 md:pb-16">
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-4">
-            <span className="text-[12px] font-medium text-white/70 uppercase tracking-[0.25em]">
-              02
-            </span>
-            <div className="w-px h-4 bg-white/20" />
-            <span className="text-[12px] font-medium text-red-600 uppercase tracking-[0.25em]">
-              Select Plan
-            </span>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-4">
+              <span className="text-[12px] font-medium text-white/70 uppercase tracking-[0.25em]">
+                02
+              </span>
+              <div className="w-px h-4 bg-white/20" />
+              <span className="text-[12px] font-medium text-red-600 uppercase tracking-[0.25em]">
+                Select Plan
+              </span>
+            </div>
+            <h2 className="text-white text-[32px] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
+              Choose your
+              <br />
+              <span className="text-white/50">membership</span>
+            </h2>
           </div>
-          <h2 className="text-white text-[32px] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
-            Choose your
-            <br />
-            <span className="text-white/50">membership</span>
-          </h2>
-        </div>
 
-        {/* Toggle */}
-        <div className="flex items-center mt-10">
-          <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 backdrop-blur-sm">
+          {/* Toggle */}
+          <div className="flex items-center">
+            <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 backdrop-blur-sm">
             <span
               className={`text-sm font-medium transition-colors duration-300 ${
                 !isCouple ? "text-white" : "text-white/40"
@@ -167,6 +168,7 @@ const Pricing = () => {
               </span>
             </div>
           </div>
+        </div>
         </div>
       </div>
 

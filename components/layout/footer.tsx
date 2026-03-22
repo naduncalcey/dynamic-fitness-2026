@@ -41,13 +41,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr] gap-12 lg:gap-8">
           {/* Brand column */}
           <div>
-            <Image
-              src="/logo.svg"
-              alt="Dynamic Fitness"
-              width={140}
-              height={40}
-              className="h-8 w-auto"
-            />
+            <a href="/">
+              <Image
+                src="/logo.svg"
+                alt="Dynamic Fitness"
+                width={140}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </a>
             <p className="mt-4 text-sm text-gray-400 leading-relaxed max-w-[280px]">
               Nawinna&apos;s premier fitness destination. State-of-the-art
               equipment and expert trainers for your transformation.

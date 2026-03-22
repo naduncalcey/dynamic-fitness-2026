@@ -38,7 +38,7 @@ const SpotlightButton = ({ children, className = "", onClick, variant = "red" }:
       ref={buttonRef}
       onMouseMove={handleMouseMove}
       onClick={onClick}
-      className={`group/spot relative inline-flex items-center justify-center px-8 py-[0.9rem] w-fit overflow-hidden rounded-[18px] border bg-[rgba(20,20,20,0.6)] backdrop-blur-md text-[#aaa] text-sm tracking-[0.12em] uppercase transition-colors duration-300 hover:text-white ${className}`}
+      className={`group/spot relative inline-flex items-center justify-center px-8 py-[0.9rem] w-fit overflow-hidden rounded-[18px] border bg-[rgba(20,20,20,0.6)] backdrop-blur-md text-[#aaa] text-sm tracking-[0.12em] uppercase transition-colors duration-300 hover:text-white cursor-pointer ${className}`}
       style={{ borderColor: v.borderColor }}
     >
       <div

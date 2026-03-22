@@ -4,8 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 
 const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "About", href: "/#about" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Careers", href: "/careers" },
 ];
 
 const Header = () => {
@@ -18,13 +19,15 @@ const Header = () => {
       <nav className="relative z-50">
         <div className="container lg:border-x lg:border-white/20 py-[20px]">
           <div className="flex items-center justify-between">
-            <Image
-              src="/logo.svg"
-              alt="Dynamic Fitness"
-              width={140}
-              height={40}
-              className="h-8 w-auto"
-            />
+            <a href="/">
+              <Image
+                src="/logo.svg"
+                alt="Dynamic Fitness"
+                width={140}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </a>
 
             {/* Desktop links */}
             <div className="hidden md:flex items-center gap-8">

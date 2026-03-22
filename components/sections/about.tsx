@@ -96,7 +96,7 @@ const About = () => {
             <div
               className="absolute inset-0 pointer-events-none z-10"
               style={{
-                backgroundColor: "rgba(255, 0, 0, 0.2)",
+                backgroundColor: "rgba(255, 0, 0, 0.1)",
                 mixBlendMode: "color",
               }}
             />
@@ -118,7 +118,7 @@ const About = () => {
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    backgroundColor: "rgba(255, 0, 0, 0.2)",
+                    backgroundColor: "rgba(255, 0, 0, 0.1)",
                     mixBlendMode: "color",
                   }}
                 />
