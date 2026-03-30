@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import CareersHeader from "@/components/sections/careers-header";
 import { getContent } from "@/lib/content";
 import type { CareersContent } from "@/lib/content-types";
