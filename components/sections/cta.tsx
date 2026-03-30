@@ -2,8 +2,12 @@
 
 import Image from "next/image";
 import SpotlightButton from "../ui/spotlight-button";
+import type { CTAContent } from "@/lib/content-types";
+import { ctaDefaults } from "@/lib/content-defaults";
 
-const CTA = () => {
+const CTA = ({ content }: { content?: CTAContent }) => {
+  const c = content ?? ctaDefaults;
+
   return (
     <section className="w-full border-t border-white/20">
       <div className="container relative z-0 lg:border-x lg:border-white/20 py-[80px] md:py-[120px] lg:py-[160px] overflow-hidden">
@@ -17,20 +21,19 @@ const CTA = () => {
 
         <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
           <h2 className="text-white text-[32px] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
-            Ready to start your{" "}
+            {c.headline}{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-red-500 font-serif italic">
-              transformation
+              {c.highlightWord}
             </span>
             ?
           </h2>
 
           <p className="mt-6 text-base md:text-lg text-gray-400 leading-relaxed max-w-lg">
-            Join hundreds of fitness enthusiasts currently training at Dynamic
-            Fitness to achieve their goals and unlock their full potential.
+            {c.description}
           </p>
 
           <div className="mt-10">
-            <SpotlightButton variant="red" onClick={() => window.open("https://calendly.com/nadun-n-dynamicfitness/30min", "_blank")}>Book a Free Consultation</SpotlightButton>
+            <SpotlightButton variant="red" onClick={() => window.open(c.ctaLink, "_blank")}>{c.ctaText}</SpotlightButton>
           </div>
         </div>
       </div>

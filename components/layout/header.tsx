@@ -2,14 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import type { HeaderContent } from "@/lib/content-types";
+import { headerDefaults } from "@/lib/content-defaults";
 
-const navLinks = [
-  { label: "About", href: "/#about" },
-  { label: "Pricing", href: "/#pricing" },
-  { label: "Careers", href: "/careers" },
-];
-
-const Header = () => {
+const Header = ({ content }: { content?: HeaderContent }) => {
+  const c = content ?? headerDefaults;
   const [open, setOpen] = useState(false);
 
   const close = () => setOpen(false);
@@ -31,7 +28,7 @@ const Header = () => {
 
             {/* Desktop links */}
             <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
+              {c.navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -71,7 +68,7 @@ const Header = () => {
             : "opacity-0 pointer-events-none"
         }`}
       >
-        {navLinks.map((link) => (
+        {c.navLinks.map((link) => (
           <a
             key={link.href}
             href={link.href}

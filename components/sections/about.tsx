@@ -3,13 +3,8 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import SpotlightButton from "../ui/spotlight-button";
-
-const imageLabels = [
-  "Our Facility",
-  "Strength Zone",
-  "Strength Zone",
-  "Cardio Area",
-];
+import type { AboutContent } from "@/lib/content-types";
+import { aboutDefaults } from "@/lib/content-defaults";
 
 const CursorTooltip = ({
   label,
@@ -54,7 +49,9 @@ const CursorTooltip = ({
   );
 };
 
-const About = () => {
+const About = ({ content }: { content?: AboutContent }) => {
+  const c = content ?? aboutDefaults;
+
   return (
     <section id="about" className="w-full scroll-mt-20">
       <div className="container lg:border-x lg:border-white/20 py-[60px] md:py-[80px] lg:py-[100px]">
@@ -62,29 +59,27 @@ const About = () => {
         <div className="flex flex-col gap-6 md:grid md:grid-cols-2 md:gap-[20px]">
           <div>
             <p className="text-[12px] font-medium text-white/70 uppercase tracking-[0.25em]">
-              01
+              {c.sectionNumber}
               <span className="pl-4 ml-2 border-l border-white/20 text-[12px] font-medium text-red-600 uppercase tracking-[0.25em]">
-                State of the Art Fitness Center
+                {c.sectionLabel}
               </span>
             </p>
             <h2 className="mt-6 md:mt-10 text-white text-[32px] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
-              Built for
+              {c.headline}
               <br />
-              <span className="text-white/50">Transformations</span>
+              <span className="text-white/50">{c.headlineFaded}</span>
             </h2>
           </div>
           <div className="md:py-12">
             <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-md">
-              Transform your workouts and redefine your limits at Dynamic
-              Fitness, where innovation meets inspiration. Elevate your fitness
-              game today and discover the dynamic difference
+              {c.description}
             </p>
-            <SpotlightButton className="mt-6" onClick={() => window.open("https://www.google.com/maps/dir//Dynamic+Fitness+(Pvt)+Ltd,+14+Sri+Devananda+Rd,+Maharagama+10280/@6.8523328,79.912721,16z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3ae25b00267d1985:0xc9c0845e8629e66b!2m2!1d79.9138617!2d6.8553051?entry=ttu&g_ep=EgoyMDI2MDMxOC4xIKXMDSoASAFQAw%3D%3D", "_blank")}>Set Route</SpotlightButton>
+            <SpotlightButton className="mt-6" onClick={() => window.open(c.ctaLink, "_blank")}>{c.ctaText}</SpotlightButton>
           </div>
         </div>
 
         {/* Main image */}
-        <CursorTooltip label={imageLabels[0]}>
+        <CursorTooltip label={c.imageTooltips[0]}>
           <div className="group relative mt-4 md:mt-6 overflow-hidden rounded-3xl cursor-none">
             <Image
               src="/output.webp"
@@ -106,7 +101,7 @@ const About = () => {
         {/* Three-image grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-3 md:mt-4">
           {["/promo-1.webp", "/promo-2.webp", "/promo-3.webp"].map((src, i) => (
-            <CursorTooltip key={i} label={imageLabels[i + 1]}>
+            <CursorTooltip key={i} label={c.imageTooltips[i + 1] ?? ""}>
               <div className="group relative overflow-hidden rounded-2xl cursor-none">
                 <Image
                   src={src}

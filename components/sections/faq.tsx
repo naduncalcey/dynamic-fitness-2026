@@ -2,41 +2,11 @@
 
 import { useState } from "react";
 import SpotlightButton from "../ui/spotlight-button";
+import type { FAQContent } from "@/lib/content-types";
+import { faqDefaults } from "@/lib/content-defaults";
 
-const faqs = [
-  {
-    question: "What are your gym operating hours?",
-    answer:
-      "We're open on weekdays from 5:30 AM to 11:00 PM. Public holidays may have adjusted hours follow our socials for updates.",
-  },
-  {
-    question: "Do I need prior experience to join?",
-    answer:
-      "All experience levels are welcomed at Dynamic Fitness from complete beginners to advanced athletes. Our trainers will guide you through proper form, technique, and a personalised routine from day one.",
-  },
-  {
-    question: "Are personal training sessions included?",
-    answer:
-      "All memberships include an initial assessment and orientation session. Dedicated personal training packages can be added to any plan at a discounted member rate.",
-  },
-  {
-    question: "What is the FitConnect app?",
-    answer:
-      "FitConnect is our member companion app where you can track workouts, book HIIT classes, view your nutrition plan, and monitor your progress all in one place.",
-  },
-  {
-    question: "Can I freeze or cancel my membership?",
-    answer:
-      "You can cancel your membership anytime. However, please note that we have a no refund policy for any membership plan.",
-  },
-  {
-    question: "Do you offer couple or group discounts?",
-    answer:
-      "We offer couple plans that save you up to 15%. For corporate or group enquiries of 5+, contact us directly for a custom package.",
-  },
-];
-
-const FAQ = () => {
+const FAQ = ({ content }: { content?: FAQContent }) => {
+  const c = content ?? faqDefaults;
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggle = (i: number) =>
@@ -50,33 +20,33 @@ const FAQ = () => {
           <div className="flex flex-col">
             <div className="flex items-center gap-4">
               <span className="text-[12px] font-medium text-white/70 uppercase tracking-[0.25em]">
-                03
+                {c.sectionNumber}
               </span>
               <div className="w-px h-4 bg-white/20" />
               <span className="text-[12px] font-medium text-red-600 uppercase tracking-[0.25em]">
-                FAQs
+                {c.sectionLabel}
               </span>
             </div>
 
             <h2 className="mt-6 md:mt-10 text-white text-[32px] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
-              Frequently
-              <br />
-              Asked
-              <br />
-              Questions
+              {c.headline.split(" ").map((word, i) => (
+                <span key={i}>
+                  {word}
+                  {i < c.headline.split(" ").length - 1 && <br />}
+                </span>
+              ))}
             </h2>
 
             <p className="mt-8 text-sm md:text-base text-gray-400 leading-relaxed max-w-sm">
-              Still have questions? We&apos;re here to help. Get in touch and
-              our team will guide you through everything you need to know.
+              {c.description}
             </p>
 
-            <SpotlightButton className="mt-6">Contact Us</SpotlightButton>
+            <SpotlightButton className="mt-6">{c.contactCtaText}</SpotlightButton>
           </div>
 
           {/* Right column — accordion */}
           <div className="flex flex-col divide-y divide-white/10 border-t border-white/10 lg:border-t-0">
-            {faqs.map((faq, i) => (
+            {c.faqs.map((faq, i) => (
               <button
                 key={i}
                 onClick={() => toggle(i)}

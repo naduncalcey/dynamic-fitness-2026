@@ -2,38 +2,12 @@
 
 import Image from "next/image";
 import SpotlightButton from "../ui/spotlight-button";
+import type { FooterContent } from "@/lib/content-types";
+import { footerDefaults } from "@/lib/content-defaults";
 
-const linkGroups = [
-  {
-    title: "Services",
-    links: [
-      { label: "Personal Training", href: "#" },
-      { label: "HIIT Classes", href: "#" },
-      { label: "Nutrition Plans", href: "#" },
-      { label: "Pricing", href: "#" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "FitConnect App", href: "#" },
-      { label: "Class Schedule", href: "#" },
-      { label: "Member Portal", href: "#" },
-      { label: "FAQs", href: "#" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "About Us", href: "#" },
-      { label: "Careers", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "Contact", href: "#" },
-    ],
-  },
-];
+const Footer = ({ content }: { content?: FooterContent }) => {
+  const c = content ?? footerDefaults;
 
-const Footer = () => {
   return (
     <footer className="w-full border-t border-white/20">
       {/* Top section */}
@@ -51,8 +25,7 @@ const Footer = () => {
               />
             </a>
             <p className="mt-4 text-sm text-gray-400 leading-relaxed max-w-[280px]">
-              Nawinna&apos;s premier fitness destination. State-of-the-art
-              equipment and expert trainers for your transformation.
+              {c.description}
             </p>
             <a
               href="https://ebadge.bestweb.lk/api/v1/clicked/dynamicfitness.lk/BestWeb/2025/Rate_Us"
@@ -71,7 +44,7 @@ const Footer = () => {
           </div>
 
           {/* Link columns */}
-          {linkGroups.map((group) => (
+          {c.linkGroups.map((group) => (
             <div key={group.title}>
               <p className="text-[11px] font-medium text-white/50 uppercase tracking-[0.2em] mb-5">
                 {group.title}
@@ -94,12 +67,12 @@ const Footer = () => {
 
         {/* CTA row */}
         <div className="mt-12 pt-8 border-t border-white/10">
-          <SpotlightButton onClick={() => window.open("https://calendly.com/nadun-n-dynamicfitness/30min", "_blank")}>
+          <SpotlightButton onClick={() => window.open(c.ctaLink, "_blank")}>
             <span className="flex items-center gap-3">
               <span className="text-red-400 text-xs tracking-[0.15em]">
-                START NOW //
+                {c.ctaPrefix}
               </span>
-              Book a Free Consultation
+              {c.ctaText}
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -129,7 +102,7 @@ const Footer = () => {
             WebkitTextFillColor: "transparent",
           }}
         >
-          DYNAMIC
+          {c.brandText}
         </p>
       </div>
 
@@ -139,7 +112,7 @@ const Footer = () => {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span className="text-[11px] font-mono text-white/40 uppercase tracking-[0.15em]">
-              Open 6 AM – 10 PM
+              {c.hours}
             </span>
           </div>
           <div className="flex items-center gap-6 text-[11px] font-mono text-white/40 uppercase tracking-[0.1em]">

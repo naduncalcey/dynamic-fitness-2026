@@ -3,38 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-
-interface Review {
-  name: string;
-  photo: string;
-  rating: number;
-  text: string;
-  time: string;
-}
-
-const reviews: Review[] = [
-  {
-    name: "Imasha Sashini",
-    photo: "https://lh3.googleusercontent.com/a/ACg8ocK17GUmhJvH_pMQyFD7WGe2Fx9pFYHEBW1wc6iChYhCBJ-HKA=s128-c0x00000000-cc-rp-mo",
-    rating: 5,
-    text: "Dynamic Fitness is a great place to workout. The trainers are experienced, supportive, and really focus on proper technique and motivation. The training sessions are well-structured and effective. Plus, the membership charges are very reasonable for the quality of service provided.",
-    time: "7 months ago",
-  },
-  {
-    name: "Rajitha Abeysinghe",
-    photo: "https://lh3.googleusercontent.com/a/ACg8ocJnaZaZeLRAlsK0HeGvQfkWxof5PmLxQiBpGupJzCQ0DyvQUw=s128-c0x00000000-cc-rp-mo",
-    rating: 5,
-    text: "Best gym around Nawinna. Modern equipments, clean facility + friendly and knowledgeable trainers. Highly recommended if you are looking for a gym around Nawinna area.",
-    time: "a year ago",
-  },
-  {
-    name: "Sasindu Mendis",
-    photo: "https://lh3.googleusercontent.com/a-/ALV-UjXq-dAGCepkvDUd6O3VMlRLdLD8Nl92UMTS2nQ32YGSBx__EywfEQ=s128-c0x00000000-cc-rp-mo-ba4",
-    rating: 5,
-    text: "Easily accessible location right by the high-level road, friendly, welcoming and supportive people regardless you're a pro or beginner, good range of equipment, loves the place and vibe!",
-    time: "a year ago",
-  },
-];
+import type { TestimonialsContent } from "@/lib/content-types";
+import { testimonialsDefaults } from "@/lib/content-defaults";
 
 const StarRating = ({ rating }: { rating: number }) => (
   <div className="flex items-center gap-1 mb-6">
@@ -62,13 +32,16 @@ const wordVariants = {
   exit: { opacity: 0, y: -8, filter: "blur(4px)", transition: { duration: 0.25 } },
 };
 
-const SingleTestimonial = () => {
+const SingleTestimonial = ({ content }: { content?: TestimonialsContent }) => {
+  const c = content ?? testimonialsDefaults;
+  const reviews = c.testimonials;
+
   const [index, setIndex] = useState(0);
   const current = reviews[index];
 
   const next = useCallback(() => {
     setIndex((prev) => (prev + 1) % reviews.length);
-  }, []);
+  }, [reviews.length]);
 
   useEffect(() => {
     const timer = setInterval(next, 8000);
@@ -83,7 +56,6 @@ const SingleTestimonial = () => {
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto min-h-[280px] sm:min-h-[260px] md:min-h-[300px] lg:min-h-[320px] justify-center">
           <StarRating rating={current.rating} />
 
-          {/* Staggered word animation */}
           <AnimatePresence mode="wait">
             <motion.blockquote
               key={index}
@@ -109,7 +81,6 @@ const SingleTestimonial = () => {
             </motion.blockquote>
           </AnimatePresence>
 
-          {/* Author */}
           <AnimatePresence mode="wait">
             <motion.div
               key={index}
