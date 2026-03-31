@@ -17,6 +17,7 @@ const sections = {
   ],
   careers: [
     { key: "header", label: "Careers Header", description: "Page title and description text" },
+    { key: "listings", label: "Job Listings", description: "Create and manage career openings", href: "/cms/careers" },
   ],
   global: [
     { key: "header", label: "Navigation", description: "Navigation menu links" },
@@ -83,7 +84,7 @@ export default function CMSDashboard() {
                     {items.map((item) => (
                       <a
                         key={item.key}
-                        href={`/cms/edit/${page}/${item.key}`}
+                        href={"href" in item && item.href ? item.href : `/cms/edit/${page}/${item.key}`}
                         className="group block p-4 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900 transition-all"
                       >
                         <div className="flex items-center justify-between">

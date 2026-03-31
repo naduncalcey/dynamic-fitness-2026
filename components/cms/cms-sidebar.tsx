@@ -13,6 +13,7 @@ const sections = {
   ],
   careers: [
     { key: "header", label: "Careers Header" },
+    { key: "listings", label: "Job Listings", href: "/cms/careers" },
   ],
   global: [
     { key: "header", label: "Navigation" },
@@ -39,8 +40,8 @@ export default function CMSSidebar() {
             </p>
             <ul className="space-y-0.5">
               {items.map((item) => {
-                const href = `/cms/edit/${page}/${item.key}`;
-                const isActive = pathname === href;
+                const href = ("href" in item && item.href) ? item.href : `/cms/edit/${page}/${item.key}`;
+                const isActive = pathname === href || pathname.startsWith(href + "/");
                 return (
                   <li key={item.key}>
                     <a

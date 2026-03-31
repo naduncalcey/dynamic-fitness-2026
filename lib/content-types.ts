@@ -81,6 +81,31 @@ export interface CareersContent {
   description: string;
 }
 
+export interface CareerListing {
+  id: string;
+  title: string;
+  type: string;
+  location: string;
+  description: string;
+  requirements: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CareerApplication {
+  id: string;
+  listing_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  resume_url: string | null;
+  status: string;
+  created_at: string;
+  career_listings?: { title: string };
+}
+
 export interface FooterLinkGroup {
   title: string;
   links: { label: string; href: string }[];
