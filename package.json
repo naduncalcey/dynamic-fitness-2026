@@ -1,5 +1,5 @@
 {
-  "name": "dynamic-fitness-lk-2026-new",
+  "name": "dynamic-fitness-2026",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,13 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.10.0",
-    "@supabase/supabase-js": "^2.100.1",
-    "framer-motion": "^12.38.0",
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "unicornstudio-react": "^2.1.4-1"
+    "@contentful/rich-text-react-renderer": "^16.2.1",
+    "@contentful/rich-text-types": "^17.2.7",
+    "next": "16.2.7",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "resend": "^6.12.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -23,7 +22,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
