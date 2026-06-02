@@ -124,6 +124,63 @@ export function Hero({ section }: HeroProps) {
 
 That's the whole pattern. No other wiring is needed.
 
+## Common components (Cta, Image, Video, RichText)
+
+Reusable building blocks that sections and Rich Text embed live under
+`components/common/`. They are **not** sections — they have no registry entry
+and no `hydrate`/`render`. A section's query pulls them in via the shared
+fragments and renders them directly.
+
+| Concern | Component | Fragment | Content type |
+| --- | --- | --- | --- |
+| Button / link | `components/common/Cta` | `fragments/cta.ts` (`CtaFields`) | `cta` |
+| Image (+ mobile art-direction) | `components/common/ResponsiveImage` | `fragments/image.ts` (`ImageFields`) | `image` |
+| Video (self-hosted / YouTube / Vimeo) | `components/common/VideoPlayer` | `fragments/video.ts` (`VideoFields`) | `video` |
+| Rich Text | `components/common/RichText` | `fragments/richText.ts` | *(field, not a type)* |
+
+Shared TS types: `lib/contentful/common/types.ts`. CTA href resolution:
+`lib/contentful/common/resolveCtaHref.ts`.
+
+- **Cta** — two variants, `Red` (primary) and `Gray` (secondary), ported from
+  the previous site's SpotlightButton (dark glassmorphism pill + mouse-tracking
+  spotlight beam). Variant/size routing is switch-case; colors come from the
+  `--cta-*` CSS variables in `app/globals.css`. Internal links render via
+  `next/link`, external/download via `<a>`.
+- **ResponsiveImage** — `next/image`; renders the `mobile` asset below `md` when
+  present, SVGs bypass optimization. Contentful's CDN host is allow-listed in
+  `next.config.ts` (`images.ctfassets.net`).
+- **VideoPlayer** — switch-case on `videoType`; iframes for YouTube/Vimeo,
+  native `<video>` for self-hosted. Autoplay forces muted.
+- **RichText** — `@contentful/rich-text-react-renderer`. Query a rich text field
+  with `richTextField("fieldName")` and prepend `RICH_TEXT_FRAGMENTS` to the
+  query so embedded entries resolve. Embedded `Cta`/`Image`/`Video` entries and
+  image assets are dispatched in `RichText/options.tsx`.
+
+**Using a rich text field in a section query** — prepend `RICH_TEXT_FRAGMENTS`
+(the `CtaFields`/`ImageFields`/`VideoFields` definitions the links depend on)
+and interpolate `richTextField("body")` where the field selection goes:
+
+```ts
+import {
+  RICH_TEXT_FRAGMENTS,
+  richTextField,
+} from "@/lib/contentful/graphql/fragments/richText";
+
+export const MY_SECTION = `
+  ${RICH_TEXT_FRAGMENTS}
+  query MySection($id: String!) {
+    mySection(id: $id) {
+      ${richTextField("body")}  // expands to: body { json links { ... } }
+    }
+  }
+`;
+```
+
+Include each fragment definition (`CtaFields`, `ImageFields`, `VideoFields`)
+**exactly once** per query document to avoid duplicate-fragment errors.
+
+See `app/component-preview` for a live render of all four with sample data.
+
 ## Theming
 
 Components must reference brand tokens via CSS variables defined in

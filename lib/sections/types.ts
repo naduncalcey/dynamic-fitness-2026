@@ -1,3 +1,14 @@
+import type {
+  AccordionItemEntry,
+  CtaEntry,
+  ImageEntry,
+  PricingPlanEntry,
+  ReviewEntry,
+  RichTextField,
+  VideoEntry,
+} from "@/lib/contentful/common/types";
+import type { BlogPostCard } from "@/lib/contentful/blog/types";
+
 export type ImageAsset = {
   url: string | null;
   width?: number | null;
@@ -30,4 +41,113 @@ export type UnknownSection = BaseSection & {
   raw: unknown;
 };
 
-export type Section = UnknownSection;
+/** Variant values for the Hero `frontEndComponent` field. */
+export type HeroFrontEndComponent = "Hero - default";
+
+export type HeroSection = BaseSection & {
+  type: "hero";
+  frontEndComponent: HeroFrontEndComponent | string | null;
+  eyebrow: string | null;
+  headline: string | null;
+  highlightText: string | null;
+  subheading: RichTextField | null;
+  backgroundImage: ImageEntry | null;
+  backgroundVideo: VideoEntry | null;
+  ctas: CtaEntry[];
+};
+
+/** Variant values for the Info `frontEndComponent` field. */
+export type InfoFrontEndComponent =
+  | "Info - Image Explainer"
+  | "Info - Pricing"
+  | "Info - Default";
+
+export type InfoSection = BaseSection & {
+  type: "info";
+  frontEndComponent: InfoFrontEndComponent | string | null;
+  sectionNumber: string | null;
+  sectionLabel: string | null;
+  headline: string | null;
+  headlineFaded: string | null;
+  // Default (rich text article)
+  body: RichTextField | null;
+  // Image Explainer
+  description: RichTextField | null;
+  imageTooltips: string[];
+  cta: CtaEntry | null;
+  mainImage: ImageEntry | null;
+  galleryImages: ImageEntry[];
+  // Pricing
+  coupleDiscountLabel: string | null;
+  individualPlans: PricingPlanEntry[];
+  couplePlans: PricingPlanEntry[];
+};
+
+/** Variant values for the Testimonial `frontEndComponent` field. */
+export type TestimonialFrontEndComponent = "Testimonial - Default";
+
+export type TestimonialSection = BaseSection & {
+  type: "testimonial";
+  frontEndComponent: TestimonialFrontEndComponent | string | null;
+  reviews: ReviewEntry[];
+};
+
+/** Variant values for the Accordion `frontEndComponent` field. */
+export type AccordionFrontEndComponent = "Accordion - FAQ" | "Accordion - Steps";
+
+export type AccordionSection = BaseSection & {
+  type: "accordion";
+  frontEndComponent: AccordionFrontEndComponent | string | null;
+  sectionNumber: string | null;
+  sectionLabel: string | null;
+  headline: string | null;
+  description: RichTextField | null;
+  cta: CtaEntry | null;
+  items: AccordionItemEntry[];
+};
+
+/** Variant values for the Banner `frontEndComponent` field. */
+export type BannerFrontEndComponent = "Banner - CTA";
+
+export type BannerSection = BaseSection & {
+  type: "banner";
+  frontEndComponent: BannerFrontEndComponent | string | null;
+  headline: string | null;
+  highlightWord: string | null;
+  description: RichTextField | null;
+  cta: CtaEntry | null;
+  backgroundImage: ImageEntry | null;
+};
+
+/** Variant values for the CareersForm `frontEndComponent` field. */
+export type CareersFormFrontEndComponent = "Careers Form";
+
+export type CareersFormSection = BaseSection & {
+  type: "careersForm";
+  frontEndComponent: CareersFormFrontEndComponent | string | null;
+  heading: string | null;
+  description: RichTextField | null;
+  positions: string[];
+  successMessage: string | null;
+};
+
+/** Variant values for the BlogListing `frontEndComponent` field. */
+export type BlogListingFrontEndComponent = "Blog Listing - Default";
+
+export type BlogListingSection = BaseSection & {
+  type: "blogListing";
+  frontEndComponent: BlogListingFrontEndComponent | string | null;
+  heading: string | null;
+  description: RichTextField | null;
+  posts: BlogPostCard[];
+};
+
+export type Section =
+  | UnknownSection
+  | HeroSection
+  | InfoSection
+  | TestimonialSection
+  | AccordionSection
+  | BannerSection
+  | CareersFormSection
+  | BlogListingSection;

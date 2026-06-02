@@ -5,24 +5,79 @@
  * `bg-[var(--brand-primary)]`, `text-[var(--text-default)]`, etc.
  */
 :root {
-  --background: #ffffff;
-  --foreground: #141414;
+  /* Dark is the default theme. */
+  color-scheme: dark;
 
-  --brand-primary: #0066cc;
-  --brand-primary-hover: #004c99;
-  --text-default: #141414;
-  --text-muted: #6a6a6a;
-  --bg-muted: #f5f5f5;
+  --background: #000000;
+  --foreground: #ededed;
+
+  --brand-primary: #ff5a5a;
+  --brand-primary-hover: #ff7a7a;
+  --text-default: #ededed;
+  --text-muted: #a1a1a1;
+  --bg-muted: #141414;
+
+  /*
+   * CTA / button surface tokens — ported from the previous site's
+   * SpotlightButton. The hover "spotlight" beam gradient is set inline in the
+   * Cta component (it tracks the mouse via --spot-x/--spot-y on the element);
+   * only the shared surface, text, and border colors live here.
+   */
+  --cta-surface: rgba(20, 20, 20, 0.6);
+  --cta-text: #aaaaaa;
+  --cta-text-hover: #ffffff;
+  --cta-red-border: rgba(255, 80, 80, 0.25);
+  --cta-gray-border: rgba(255, 255, 255, 0.15);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-roboto);
+  --font-sans: var(--font-inter);
+  /* `font-serif` → Playfair Display (the hero highlight uses font-serif italic). */
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+}
+
+/*
+ * Hero partner-logo marquee. Defined as a plain utility (not via @theme) so it
+ * is emitted identically in dev and production and never depends on theme
+ * recompilation. The LogoScroll component toggles animation-play-state inline.
+ */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* Testimonial carousel fade-up (replays per slide via a keyed element). */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.5s ease-out both;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
