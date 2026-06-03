@@ -246,3 +246,53 @@ export function gymJsonLd(): Record<string, unknown> {
     })),
   };
 }
+
+/**
+ * Flatten a Contentful Rich Text field to plain text. Walks the document tree,
+ * collecting text values and inserting line breaks at block boundaries. Used by
+ * FAQ structured data and the llms.txt content files (no markup needed there).
+ */
+export function richTextToPlainText(field?: { json?: unknown } | null): string {
+  const root = field?.json as { nodeType?: string; content?: unknown[]; value?: string } | undefined;
+  if (!root) return "";
+  const out: string[] = [];
+  const walk = (node: unknown) => {
+    if (!node || typeof node !== "object") return;
+    const n = node as { nodeType?: string; value?: string; content?: unknown[] };
+    if (n.nodeType === "text" && typeof n.value === "string") {
+      out.push(n.value);
+      return;
+    }
+    if (Array.isArray(n.content)) n.content.forEach(walk);
+    // Newline after block-level nodes (paragraphs, headings, list items, …).
+    if (n.nodeType && n.nodeType !== "text" && n.nodeType !== "document") out.push("\n");
+  };
+  walk(root);
+  return out.join("").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+type FaqItem = { question?: string | null; answer?: { json?: unknown } | null };
+
+/**
+ * FAQPage JSON-LD from a list of question/answer items. Returns null if there
+ * are no usable Q&As. Answers are flattened to plain text. AI assistants and
+ * search engines can quote these directly.
+ */
+export function faqJsonLd(items: FaqItem[]): Record<string, unknown> | null {
+  const qas = items
+    .map((i) => ({
+      q: (i.question ?? "").trim(),
+      a: richTextToPlainText(i.answer).trim(),
+    }))
+    .filter((x) => x.q && x.a);
+  if (qas.length === 0) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: qas.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  };
+}

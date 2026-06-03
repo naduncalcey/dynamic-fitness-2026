@@ -29,12 +29,19 @@ const getEnv = () => {
 
 type RequestOptions = {
   preview?: boolean;
+  /**
+   * Seconds to cache this response via Next's data cache. Omit (default) for
+   * always-fresh `no-store` — correct for page content. Set it for endpoints
+   * that tolerate staleness and are hit often (e.g. the sitemap) so we don't
+   * re-query Contentful on every request.
+   */
+  revalidate?: number;
 };
 
 export async function contentfulFetch<T>(
   query: string,
   variables: Record<string, unknown> = {},
-  { preview = false }: RequestOptions = {}
+  { preview = false, revalidate }: RequestOptions = {}
 ): Promise<T> {
   const env = getEnv();
   const token = preview ? env.previewToken : env.deliveryToken;
@@ -53,7 +60,9 @@ export async function contentfulFetch<T>(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query, variables }),
-    cache: "no-store",
+    ...(typeof revalidate === "number"
+      ? { next: { revalidate } }
+      : { cache: "no-store" as const }),
   });
 
   if (!res.ok) {

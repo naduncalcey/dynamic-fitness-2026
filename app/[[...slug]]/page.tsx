@@ -5,9 +5,20 @@ import { getBlogPostBySlug } from "@/lib/contentful/blog";
 import { SectionsRenderer } from "@/lib/sections/SectionsRenderer";
 import { BlogPostTemplate } from "@/components/templates/BlogPost";
 import { splitLocaleFromSlug } from "@/lib/i18n/locale";
-import { absoluteUrl, blogPostMetadata, gymJsonLd } from "@/lib/seo";
+import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/common/JsonLd";
-import type { SeoEntry } from "@/lib/sections/types";
+import type { Section, SeoEntry } from "@/lib/sections/types";
+
+/** Collect Q&A items from any "Accordion - FAQ" sections on the page. */
+const collectFaqItems = (sections: Section[]) =>
+  sections
+    .filter(
+      (s): s is Extract<Section, { type: "accordion" }> =>
+        s.type === "accordion" &&
+        typeof s.frontEndComponent === "string" &&
+        s.frontEndComponent.includes("FAQ")
+    )
+    .flatMap((s) => s.items ?? []);
 
 export const dynamic = "force-dynamic";
 
@@ -110,10 +121,14 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
   });
   if (!page) notFound();
 
+  const faq = faqJsonLd(collectFaqItems(page.sections));
+
   return (
     <main lang={locale.htmlLang}>
       {/* Homepage carries the LocalBusiness (gym) structured data. */}
       {path === "/" ? <JsonLd data={gymJsonLd()} /> : null}
+      {/* FAQPage structured data when the page has an FAQ accordion. */}
+      {faq ? <JsonLd data={faq} /> : null}
       <SectionsRenderer sections={page.sections} />
     </main>
   );
