@@ -54,6 +54,15 @@ export const RICH_TEXT_LINKS = /* GraphQL */ `
         height
         contentType
       }
+      hyperlink {
+        sys {
+          id
+        }
+        url
+        title
+        description
+        contentType
+      }
     }
   }
 `;

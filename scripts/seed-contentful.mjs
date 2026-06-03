@@ -580,6 +580,47 @@ const AUTHOR_TYPE = {
  * Blog post (detail page). Addressed by slug at /blog/<slug>; reuses image,
  * author, and seo. Body is Rich Text (can embed Cta/Image/Video).
  */
+
+// Enable EVERY rich-text node type + mark (incl. tables). Without an explicit
+// enabledNodeTypes validation, Contentful applies a default set that excludes
+// tables, so we list them all to make the full toolbar available in the editor.
+const RICH_TEXT_ALL_NODES = [
+  {
+    enabledMarks: [
+      "bold",
+      "italic",
+      "underline",
+      "code",
+      "superscript",
+      "subscript",
+      "strikethrough",
+    ],
+    message: "All marks are enabled.",
+  },
+  {
+    enabledNodeTypes: [
+      "heading-1",
+      "heading-2",
+      "heading-3",
+      "heading-4",
+      "heading-5",
+      "heading-6",
+      "ordered-list",
+      "unordered-list",
+      "hr",
+      "blockquote",
+      "embedded-entry-block",
+      "embedded-asset-block",
+      "table",
+      "hyperlink",
+      "entry-hyperlink",
+      "asset-hyperlink",
+      "embedded-entry-inline",
+    ],
+    message: "All node types are enabled.",
+  },
+];
+
 const BLOG_POST_TYPE = {
   name: "Blog Post",
   description: "An individual blog post, rendered at /blog/<slug>.",
@@ -611,7 +652,7 @@ const BLOG_POST_TYPE = {
       linkType: "Entry",
       validations: [{ linkContentType: ["author"] }],
     },
-    { id: "body", name: "Body", type: "RichText" },
+    { id: "body", name: "Body", type: "RichText", validations: RICH_TEXT_ALL_NODES },
     {
       id: "seo",
       name: "SEO",

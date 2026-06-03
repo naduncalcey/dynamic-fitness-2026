@@ -142,6 +142,7 @@ export type RichTextField = {
     } | null;
     assets?: {
       block?: Array<(AssetEntry & { sys: { id: string } }) | null> | null;
+      hyperlink?: Array<(AssetEntry & { sys: { id: string } }) | null> | null;
     } | null;
   } | null;
 };

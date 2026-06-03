@@ -59,11 +59,17 @@ export function buildRichTextOptions(links: RichTextField["links"]): Options {
   const assets = new Map<string, AssetEntry & { sys: { id: string } }>();
   for (const a of links?.assets?.block ?? []) if (a) assets.set(a.sys.id, a);
 
+  const assetHyperlinks = new Map<string, AssetEntry & { sys: { id: string } }>();
+  for (const a of links?.assets?.hyperlink ?? []) if (a) assetHyperlinks.set(a.sys.id, a);
+
   return {
     renderMark: {
       [MARKS.BOLD]: (text) => <strong>{text}</strong>,
       [MARKS.ITALIC]: (text) => <em>{text}</em>,
       [MARKS.UNDERLINE]: (text) => <u>{text}</u>,
+      [MARKS.STRIKETHROUGH]: (text) => <s>{text}</s>,
+      [MARKS.SUPERSCRIPT]: (text) => <sup>{text}</sup>,
+      [MARKS.SUBSCRIPT]: (text) => <sub>{text}</sub>,
       [MARKS.CODE]: (text) => (
         <code className="rounded bg-[var(--bg-muted)] px-1 py-0.5 font-mono text-[0.9em]">
           {text}
@@ -105,6 +111,36 @@ export function buildRichTextOptions(links: RichTextField["links"]): Options {
         </blockquote>
       ),
       [BLOCKS.HR]: () => <hr className="my-8 border-[var(--bg-muted)]" />,
+      [BLOCKS.TABLE]: (_node, children) => (
+        <div className="my-6 overflow-x-auto">
+          <table className="w-full border-collapse text-left text-[0.95em]">
+            <tbody>{children}</tbody>
+          </table>
+        </div>
+      ),
+      [BLOCKS.TABLE_ROW]: (_node, children) => (
+        <tr className="border-b border-[var(--bg-muted)]">{children}</tr>
+      ),
+      [BLOCKS.TABLE_HEADER_CELL]: (_node, children) => (
+        <th className="border border-[var(--bg-muted)] bg-[var(--bg-muted)] px-3 py-2 align-top font-semibold [&_p]:mb-0">
+          {children}
+        </th>
+      ),
+      [BLOCKS.TABLE_CELL]: (_node, children) => (
+        <td className="border border-[var(--bg-muted)] px-3 py-2 align-top [&_p]:mb-0">
+          {children}
+        </td>
+      ),
+      [INLINES.ASSET_HYPERLINK]: (node, children) => {
+        const id = targetId(node);
+        const asset = id ? assetHyperlinks.get(id) ?? assets.get(id) : undefined;
+        if (!asset?.url) return <>{children}</>;
+        return (
+          <a href={asset.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
+            {children}
+          </a>
+        );
+      },
       [INLINES.HYPERLINK]: (node, children) => {
         const uri = (node.data?.uri as string) ?? "#";
         if (isExternalHref(uri)) {
