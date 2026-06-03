@@ -23,6 +23,7 @@ export const BLOG_POST_BY_SLUG = /* GraphQL */ `
       items {
         sys {
           id
+          publishedAt
         }
         title
         slug

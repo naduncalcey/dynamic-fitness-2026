@@ -5,7 +5,8 @@ import { getBlogPostBySlug } from "@/lib/contentful/blog";
 import { SectionsRenderer } from "@/lib/sections/SectionsRenderer";
 import { BlogPostTemplate } from "@/components/templates/BlogPost";
 import { splitLocaleFromSlug } from "@/lib/i18n/locale";
-import { absoluteUrl, blogPostMetadata } from "@/lib/seo";
+import { absoluteUrl, blogPostMetadata, gymJsonLd } from "@/lib/seo";
+import { JsonLd } from "@/components/common/JsonLd";
 import type { SeoEntry } from "@/lib/sections/types";
 
 export const dynamic = "force-dynamic";
@@ -103,13 +104,16 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
   }
 
   // Everything else (incl. /blog listing) → FlexiblePage + sections.
-  const page = await getFlexiblePageBySlug(slugPathFrom(rest), {
+  const path = slugPathFrom(rest);
+  const page = await getFlexiblePageBySlug(path, {
     locale: locale.contentfulCode,
   });
   if (!page) notFound();
 
   return (
     <main lang={locale.htmlLang}>
+      {/* Homepage carries the LocalBusiness (gym) structured data. */}
+      {path === "/" ? <JsonLd data={gymJsonLd()} /> : null}
       <SectionsRenderer sections={page.sections} />
     </main>
   );

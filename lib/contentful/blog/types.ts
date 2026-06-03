@@ -22,6 +22,8 @@ export type BlogPostCard = {
 
 /** Full post for the detail template. */
 export type BlogPostEntry = BlogPostCard & {
+  /** `publishedAt` (last publish time) backs the structured-data dateModified. */
+  sys: { id: string; publishedAt?: string | null };
   seo?: SeoEntry | null;
   body?: RichTextField | null;
 };
