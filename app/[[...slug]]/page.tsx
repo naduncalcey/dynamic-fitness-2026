@@ -5,7 +5,7 @@ import { getBlogPostBySlug } from "@/lib/contentful/blog";
 import { SectionsRenderer } from "@/lib/sections/SectionsRenderer";
 import { BlogPostTemplate } from "@/components/templates/BlogPost";
 import { splitLocaleFromSlug } from "@/lib/i18n/locale";
-import { blogPostMetadata } from "@/lib/seo";
+import { absoluteUrl, blogPostMetadata } from "@/lib/seo";
 import type { SeoEntry } from "@/lib/sections/types";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +23,7 @@ const blogPostSlug = (rest: string[]) =>
 
 const seoToMetadata = (
   seo: SeoEntry | null | undefined,
+  path: string,
   fallbackTitle?: string | null,
   fallbackDescription?: string | null
 ): Metadata => {
@@ -35,16 +36,19 @@ const seoToMetadata = (
   const ogTitle = seo?.seoTitle ?? fallbackTitle ?? undefined;
   const description = seo?.seoDescription ?? fallbackDescription ?? undefined;
   const ogImage = seo?.seoOgImage?.url ?? null;
+  // Canonical defaults to this page's own absolute URL so every page emits one
+  // (helps Google pick the right URL + title), unless an explicit override is set.
+  const canonical = seo?.seoCanonicalUrl ?? absoluteUrl(path);
 
   return {
     title,
     description,
-    alternates: seo?.seoCanonicalUrl ? { canonical: seo.seoCanonicalUrl } : undefined,
+    alternates: { canonical },
     openGraph: {
       type: "website",
       title: ogTitle,
       description,
-      url: seo?.seoCanonicalUrl ?? undefined,
+      url: canonical,
       images: ogImage
         ? [
             {
@@ -75,10 +79,11 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
     return post ? blogPostMetadata(post) : {};
   }
 
-  const page = await getFlexiblePageBySlug(slugPathFrom(rest), {
+  const path = slugPathFrom(rest);
+  const page = await getFlexiblePageBySlug(path, {
     locale: locale.contentfulCode,
   });
-  return page ? seoToMetadata(page.seo, page.pageTitle) : {};
+  return page ? seoToMetadata(page.seo, path, page.pageTitle) : {};
 };
 
 export default async function FlexiblePageRoute({ params }: PageProps) {

@@ -1752,10 +1752,12 @@ await upsertEntry("banner", "banner-careers", {
 });
 
 await upsertEntry("seo", "seo-careers", {
-  seoTitle: L("Careers — Dynamic Fitness"),
+  seoTitle: L("Careers at Dynamic Fitness — Join Our Team in Nawinna"),
   seoDescription: L(
-    "Join the Dynamic Fitness team. Apply for trainer, coaching, and front-desk roles."
+    "Build your career at Dynamic Fitness in Nawinna, Maharagama. Apply for personal trainer, coaching, and front-desk roles and grow with Sri Lanka's premier gym."
   ),
+  seoCanonicalUrl: L("https://dynamicfitness.lk/careers"),
+  seoOgImage: L(assetLink("asset-about-main")),
 });
 await upsertEntry("flexiblePage", "careers", {
   slug: L("/careers"),
