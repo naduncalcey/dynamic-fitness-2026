@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CONSENT_COOKIE, getCookie, setCookie } from "@/lib/cookies";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
 
 /**
  * Cookie consent banner. Shows once until the visitor accepts or rejects, then
@@ -13,6 +14,7 @@ import { CONSENT_COOKIE, getCookie, setCookie } from "@/lib/cookies";
  */
 
 export function CookieConsent() {
+  const t = useLabels();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -29,18 +31,17 @@ export function CookieConsent() {
   return (
     <div
       role="dialog"
-      aria-label="Cookie consent"
+      aria-label={t("cookie.ariaLabel")}
       className="fixed inset-x-0 bottom-0 z-[60] p-4"
     >
       <div className="mx-auto flex max-w-3xl flex-col items-start gap-4 rounded-2xl border border-white/10 bg-[#0d0d0d]/95 p-5 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm leading-relaxed text-white/70">
-          We use cookies to improve your experience and analyze site traffic. You can accept
-          or reject non-essential cookies.{" "}
+          {t("cookie.message")}{" "}
           <a
             href="/cookie-policy"
             className="text-white underline underline-offset-2 hover:text-red-400"
           >
-            Learn more
+            {t("cookie.learnMore")}
           </a>
         </p>
         <div className="flex shrink-0 items-center gap-3">
@@ -49,14 +50,14 @@ export function CookieConsent() {
             onClick={() => choose("rejected")}
             className="cursor-pointer rounded-full border border-white/20 px-5 py-2 text-xs font-medium uppercase tracking-[0.1em] text-white/70 transition-colors hover:text-white"
           >
-            Reject
+            {t("cookie.reject")}
           </button>
           <button
             type="button"
             onClick={() => choose("accepted")}
             className="cursor-pointer rounded-full bg-red-500 px-5 py-2 text-xs font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-red-600"
           >
-            Accept
+            {t("cookie.accept")}
           </button>
         </div>
       </div>

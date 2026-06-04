@@ -6,6 +6,8 @@ import { Footer } from "@/components/layout/Footer";
 import { CookieConsent } from "@/components/common/CookieConsent";
 import { JsonLd } from "@/components/common/JsonLd";
 import { organizationJsonLd, webSiteJsonLd, SITE_NAME, SITE_URL } from "@/lib/seo";
+import { LabelsProvider } from "@/lib/i18n/LabelsProvider";
+import { getAllUiLabels } from "@/lib/contentful/uiLabels";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,11 +45,15 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  // Fetch every locale's UI labels once; the provider picks the active locale
+  // per-request from the URL (client-side), so chrome follows the language switch.
+  const labels = await getAllUiLabels();
+
   return (
     <html
       lang="en"
@@ -57,10 +63,12 @@ export default function RootLayout({
         {/* Sitewide structured data: brand entity + search endpoint. */}
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={webSiteJsonLd()} />
-        <Header />
-        {children}
-        <Footer />
-        <CookieConsent />
+        <LabelsProvider labels={labels}>
+          <Header />
+          {children}
+          <Footer />
+          <CookieConsent />
+        </LabelsProvider>
       </body>
     </html>
   );

@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRef, type MouseEvent } from "react";
 import type { CtaEntry, CtaSize, CtaVariant } from "@/lib/contentful/common/types";
 import {
   isExternalHref,
   resolveCtaHref,
 } from "@/lib/contentful/common/resolveCtaHref";
+import { getLocaleFromPathname, localizeHref } from "@/lib/i18n/locale";
 
 /**
  * CTA button, ported from the previous Dynamic Fitness site's SpotlightButton.
@@ -56,6 +58,7 @@ const variantStyle = (variant: CtaVariant): { borderColor: string; beam: string 
 
 export function Cta({ cta, className = "" }: CtaProps) {
   const ref = useRef<HTMLAnchorElement>(null);
+  const current = getLocaleFromPathname(usePathname() ?? "/");
 
   if (!cta?.label) return null;
 
@@ -111,7 +114,7 @@ export function Cta({ cta, className = "" }: CtaProps) {
     return (
       <Link
         ref={ref}
-        href={href}
+        href={localizeHref(href, current)}
         className={classes}
         style={{ borderColor }}
         onMouseMove={handleMouseMove}

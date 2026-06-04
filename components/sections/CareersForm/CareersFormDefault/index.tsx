@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Script from "next/script";
 import { RichText } from "@/components/common/RichText";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
 import type { CareersFormSection } from "@/lib/sections/types";
 
 /**
@@ -24,6 +25,7 @@ const labelClass = "mb-2 block text-[11px] font-medium uppercase tracking-[0.15e
 
 export function CareersFormDefault({ section }: CareersFormDefaultProps) {
   const { heading, description, positions, successMessage } = section;
+  const t = useLabels();
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +44,11 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
         setStatus("success");
       } else {
         setStatus("error");
-        setError(data.error ?? "Something went wrong. Please try again.");
+        setError(data.error ?? t("careers.errorGeneric"));
       }
     } catch {
       setStatus("error");
-      setError("Network error. Please try again.");
+      setError(t("careers.errorNetwork"));
     }
   };
 
@@ -71,7 +73,7 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
           {status === "success" ? (
             <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center">
               <p className="text-lg text-white">
-                {successMessage ?? "Thanks! Your application has been sent."}
+                {successMessage ?? t("careers.success")}
               </p>
             </div>
           ) : (
@@ -89,13 +91,13 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="cf-name" className={labelClass}>
-                    Full Name *
+                    {t("careers.fullName")} *
                   </label>
-                  <input id="cf-name" name="name" required className={fieldClass} placeholder="Jane Doe" />
+                  <input id="cf-name" name="name" required className={fieldClass} placeholder={t("careers.fullNamePlaceholder")} />
                 </div>
                 <div>
                   <label htmlFor="cf-email" className={labelClass}>
-                    Email *
+                    {t("careers.email")} *
                   </label>
                   <input
                     id="cf-email"
@@ -111,13 +113,13 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="cf-phone" className={labelClass}>
-                    Phone
+                    {t("careers.phone")}
                   </label>
                   <input id="cf-phone" name="phone" className={fieldClass} placeholder="+94 ..." />
                 </div>
                 <div>
                   <label htmlFor="cf-position" className={labelClass}>
-                    Position *
+                    {t("careers.position")} *
                   </label>
                   <div className="relative">
                     <select
@@ -128,14 +130,14 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
                       className={`${fieldClass} cursor-pointer appearance-none bg-[#0d0d0d] pr-10`}
                     >
                       <option value="" disabled>
-                        Select a position
+                        {t("careers.selectPosition")}
                       </option>
                       {positions.map((p) => (
                         <option key={p} value={p}>
                           {p}
                         </option>
                       ))}
-                      <option value="General Application">General Application</option>
+                      <option value="General Application">{t("careers.generalApplication")}</option>
                     </select>
                     <svg
                       aria-hidden
@@ -153,20 +155,20 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
 
               <div>
                 <label htmlFor="cf-message" className={labelClass}>
-                  Message
+                  {t("careers.message")}
                 </label>
                 <textarea
                   id="cf-message"
                   name="message"
                   rows={4}
                   className={fieldClass}
-                  placeholder="Tell us about yourself"
+                  placeholder={t("careers.messagePlaceholder")}
                 />
               </div>
 
               <div>
                 <label htmlFor="cf-cv" className={labelClass}>
-                  CV / Resume * (PDF or Word, max 5 MB)
+                  {t("careers.cv")} *
                 </label>
                 <input
                   id="cf-cv"
@@ -198,7 +200,7 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
                 disabled={status === "submitting"}
                 className="mt-2 w-fit cursor-pointer rounded-[18px] border border-[var(--cta-red-border)] bg-[var(--cta-surface)] px-8 py-[0.9rem] text-sm uppercase tracking-[0.12em] text-[var(--cta-text)] backdrop-blur-md transition-colors duration-300 hover:text-[var(--cta-text-hover)] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {status === "submitting" ? "Sending…" : "Submit Application"}
+                {status === "submitting" ? t("careers.sending") : t("careers.submit")}
               </button>
             </form>
           )}

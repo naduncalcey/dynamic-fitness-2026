@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RichText } from "@/components/common/RichText";
 import { BlogPostCard } from "@/components/blog/BlogPostCard";
 import { UnicornBackground } from "@/components/sections/Hero/UnicornBackground";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
 import type { BlogListingSection } from "@/lib/sections/types";
 
 /**
@@ -27,6 +28,7 @@ const BLOG_UNICORN_SCRIPT_SRC =
 
 export function BlogListing({ section }: BlogListingProps) {
   const { heading, description, posts } = section;
+  const t = useLabels();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -110,8 +112,8 @@ export function BlogListing({ section }: BlogListingProps) {
                 type="search"
                 value={query}
                 onChange={(e) => onQueryChange(e.target.value)}
-                placeholder="Search articles…"
-                aria-label="Search articles"
+                placeholder={t("blog.searchPlaceholder")}
+                aria-label={t("blog.searchAria")}
                 className="w-full rounded-full border border-white/15 bg-black/40 py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/50 backdrop-blur-md outline-none transition-colors focus:border-red-500/60 focus:bg-black/60"
               />
             </div>
@@ -130,8 +132,8 @@ export function BlogListing({ section }: BlogListingProps) {
         ) : (
           <p className="text-center text-sm text-white/40">
             {posts.length === 0
-              ? "No posts yet. Check back soon."
-              : `No articles match “${query.trim()}”.`}
+              ? t("blog.noPosts")
+              : t("blog.noMatch", { q: query.trim() })}
           </p>
         )}
       </div>

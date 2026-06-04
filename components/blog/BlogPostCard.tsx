@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ResponsiveImage } from "@/components/common/ResponsiveImage";
+import { getLocaleFromPathname, localizeHref } from "@/lib/i18n/locale";
 import type { BlogPostCard as BlogPostCardType } from "@/lib/contentful/blog/types";
 
 const MONTHS = [
@@ -16,7 +20,8 @@ export function formatBlogDate(iso?: string | null): string {
 }
 
 export function BlogPostCard({ post }: { post: BlogPostCardType }) {
-  const href = `/blog/${(post.slug ?? "").replace(/^\/+/, "")}`;
+  const current = getLocaleFromPathname(usePathname() ?? "/");
+  const href = localizeHref(`/blog/${(post.slug ?? "").replace(/^\/+/, "")}`, current);
   const date = formatBlogDate(post.publishedDate);
 
   return (

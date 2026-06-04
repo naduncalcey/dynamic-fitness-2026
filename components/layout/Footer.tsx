@@ -1,6 +1,9 @@
 "use client";
 
 import { useRef, type MouseEvent } from "react";
+import { usePathname } from "next/navigation";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
+import { getLocaleFromPathname, localizeHref } from "@/lib/i18n/locale";
 
 /**
  * Global site footer, recreated from the previous Dynamic Fitness site: brand
@@ -11,53 +14,50 @@ import { useRef, type MouseEvent } from "react";
 
 const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
 
-const description =
-  "Nawinna's premier fitness destination.";
-
 const linkGroups = [
   {
-    title: "Services",
+    titleKey: "footer.group.services",
     links: [
-      { label: "Personal Training", href: "#" },
-      { label: "HIIT Classes", href: "#" },
-      { label: "Pricing", href: "#pricing" },
+      { labelKey: "footer.link.personalTraining", href: "#" },
+      { labelKey: "footer.link.hiitClasses", href: "#" },
+      { labelKey: "footer.link.pricing", href: "#pricing" },
     ],
   },
   {
-    title: "Resources",
+    titleKey: "footer.group.resources",
     links: [
-      { label: "FitConnect App", href: "#" },
-      { label: "Class Schedule", href: "#" },
-      { label: "FAQs", href: "#" },
+      { labelKey: "footer.link.fitconnect", href: "#" },
+      { labelKey: "footer.link.classSchedule", href: "#" },
+      { labelKey: "footer.link.faqs", href: "#" },
     ],
   },
   {
-    title: "Company",
+    titleKey: "footer.group.company",
     links: [
-      { label: "About Us", href: "#about" },
-      { label: "Careers", href: "/careers" },
-      { label: "Blog", href: "/blog" },
-      { label: "Contact", href: "#" },
+      { labelKey: "footer.link.about", href: "#about" },
+      { labelKey: "footer.link.careers", href: "/careers" },
+      { labelKey: "footer.link.blog", href: "/blog" },
+      { labelKey: "footer.link.contact", href: "#" },
     ],
   },
 ];
 
-const CTA_PREFIX = "START NOW //";
-const CTA_TEXT = "Book a Free Consultation";
 const CTA_LINK = "https://calendly.com/nadun-n-dynamicfitness/30min";
 const BRAND_TEXT = "DYNAMIC";
+// Postal address stays in English (proper nouns) regardless of locale.
 const ADDRESS_LINES = [
   "Dynamic Fitness (Pvt) Ltd.",
   "14 Dewananada Road,",
   "Nawinna,",
   "Maharagama",
 ];
-const HOURS = "Open 5.30 AM – 11.00 PM (Weekdays + Saturday) / 6.00 AM – 11.30 AM (Sunday)";
 
 const RED_BEAM =
   "radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255,120,120,0.25) 0%, rgba(255,80,80,0.1) 20%, rgba(0,0,0,0) 55%)";
 
 export function Footer() {
+  const t = useLabels();
+  const current = getLocaleFromPathname(usePathname() ?? "/");
   const ctaRef = useRef<HTMLAnchorElement>(null);
 
   const handleMouseMove = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -75,11 +75,11 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr] lg:gap-8">
           {/* Brand column */}
           <div>
-            <a href="/" aria-label="Dynamic Fitness">
+            <a href={localizeHref("/", current)} aria-label="Dynamic Fitness">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.svg" alt="Dynamic Fitness" className="h-8 w-auto" />
             </a>
-            <p className="mt-4 max-w-[280px] text-sm leading-relaxed text-gray-400">{description}</p>
+            <p className="mt-4 max-w-[280px] text-sm leading-relaxed text-gray-400">{t("footer.tagline")}</p>
             <address className="mt-4 text-sm not-italic leading-relaxed text-gray-400">
               {ADDRESS_LINES.map((line) => (
                 <span key={line} className="block">
@@ -105,18 +105,18 @@ export function Footer() {
 
           {/* Link columns */}
           {linkGroups.map((group) => (
-            <div key={group.title}>
+            <div key={group.titleKey}>
               <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.2em] text-white/50">
-                {group.title}
+                {t(group.titleKey)}
               </p>
               <ul className="flex flex-col gap-3">
                 {group.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.labelKey}>
                     <a
-                      href={link.href}
+                      href={localizeHref(link.href, current)}
                       className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                     >
-                      {link.label}
+                      {t(link.labelKey)}
                     </a>
                   </li>
                 ))}
@@ -142,8 +142,8 @@ export function Footer() {
               style={{ background: RED_BEAM }}
             />
             <span className="pointer-events-none relative flex items-center gap-3">
-              <span className="text-xs tracking-[0.15em] text-red-400">{CTA_PREFIX}</span>
-              {CTA_TEXT}
+              <span className="text-xs tracking-[0.15em] text-red-400">{t("footer.cta.prefix")}</span>
+              {t("footer.cta.text")}
               <svg
                 className="h-4 w-4"
                 fill="none"
@@ -180,18 +180,18 @@ export function Footer() {
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
             <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-white/40">
-              {HOURS}
+              {t("footer.hours")}
             </span>
           </div>
           <div className="flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.1em] text-white/40">
-            <a href="/privacy-policy" className="transition-colors hover:text-white">
-              Privacy
+            <a href={localizeHref("/privacy-policy", current)} className="transition-colors hover:text-white">
+              {t("footer.legal.privacy")}
             </a>
-            <a href="/terms" className="transition-colors hover:text-white">
-              Terms
+            <a href={localizeHref("/terms", current)} className="transition-colors hover:text-white">
+              {t("footer.legal.terms")}
             </a>
-            <a href="/cookie-policy" className="transition-colors hover:text-white">
-              Cookie Policy
+            <a href={localizeHref("/cookie-policy", current)} className="transition-colors hover:text-white">
+              {t("footer.legal.cookies")}
             </a>
             <span>© 2026 Dynamic Fitness</span>
           </div>

@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { ResponsiveImage } from "@/components/common/ResponsiveImage";
 import { RichText } from "@/components/common/RichText";
 import { formatBlogDate } from "@/components/blog/BlogPostCard";
+import { BackToBlogLink } from "./BackToBlogLink";
 import { blogPostJsonLd } from "@/lib/seo";
 import type { BlogPostEntry } from "@/lib/contentful/blog/types";
 
@@ -31,12 +31,7 @@ export function BlogPostTemplate({ post }: BlogPostTemplateProps) {
       />
       <div className={`pt-[60px] md:pt-[80px] lg:pt-[100px] lg:border-x lg:border-white/20 ${CONTAINER}`}>
         <div className="mx-auto max-w-3xl">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.15em] text-white/50 transition-colors hover:text-white"
-          >
-            <span aria-hidden>←</span> Back to blog
-          </Link>
+          <BackToBlogLink />
 
           {category ? (
             <span className="mt-6 block w-fit rounded-full border border-red-500/30 bg-red-500/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.15em] text-red-400">

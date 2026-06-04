@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Cta } from "@/components/common/Cta";
 import { PRICING_VIEW_COOKIE, getCookie, setCookie } from "@/lib/cookies";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
 import type { CtaEntry, PricingPlanEntry } from "@/lib/contentful/common/types";
 import type { InfoSection } from "@/lib/sections/types";
 
@@ -120,6 +121,7 @@ export function InfoPricing({ section }: InfoPricingProps) {
     couplePlans,
   } = section;
 
+  const t = useLabels();
   const [isCouple, setIsCouple] = useState(false);
   const hasCouple = couplePlans.length > 0;
   const plans = isCouple && hasCouple ? couplePlans : individualPlans;
@@ -167,11 +169,11 @@ export function InfoPricing({ section }: InfoPricingProps) {
                     !isCouple ? "text-white" : "text-white/40"
                   }`}
                 >
-                  Individual
+                  {t("pricing.individual")}
                 </span>
                 <button
                   type="button"
-                  aria-label="Toggle individual or couple pricing"
+                  aria-label={t("pricing.toggleAria")}
                   onClick={toggleView}
                   className="relative h-7 w-14 cursor-pointer rounded-full border border-white/15 bg-white/10 shadow-[inset_0_2px_5px_rgba(0,0,0,0.3)] transition-colors duration-300 hover:bg-white/15"
                 >
@@ -189,7 +191,7 @@ export function InfoPricing({ section }: InfoPricingProps) {
                       isCouple ? "text-white" : "text-white/40"
                     }`}
                   >
-                    Couple
+                    {t("pricing.couple")}
                   </span>
                   {coupleDiscountLabel ? (
                     <span className="rounded-md border border-red-500/20 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400">
