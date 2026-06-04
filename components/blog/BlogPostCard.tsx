@@ -4,20 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ResponsiveImage } from "@/components/common/ResponsiveImage";
 import { getLocaleFromPathname, localizeHref } from "@/lib/i18n/locale";
+import { formatBlogDate } from "./formatBlogDate";
 import type { BlogPostCard as BlogPostCardType } from "@/lib/contentful/blog/types";
-
-const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
-/** Deterministic UTC date format (avoids server/client locale + timezone drift). */
-export function formatBlogDate(iso?: string | null): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
-}
 
 export function BlogPostCard({ post }: { post: BlogPostCardType }) {
   const current = getLocaleFromPathname(usePathname() ?? "/");

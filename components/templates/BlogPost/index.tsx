@@ -1,6 +1,6 @@
 import { ResponsiveImage } from "@/components/common/ResponsiveImage";
 import { RichText } from "@/components/common/RichText";
-import { formatBlogDate } from "@/components/blog/BlogPostCard";
+import { formatBlogDate } from "@/components/blog/formatBlogDate";
 import { BackToBlogLink } from "./BackToBlogLink";
 import { blogPostJsonLd } from "@/lib/seo";
 import type { BlogPostEntry } from "@/lib/contentful/blog/types";
