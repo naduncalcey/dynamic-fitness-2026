@@ -26,7 +26,7 @@ export function AccordionFaq({ section }: AccordionFaqProps) {
   const headlineWords = (headline ?? "").split(" ");
 
   return (
-    <section className="w-full border-t border-white/20 bg-black">
+    <section id="faq" className="w-full scroll-mt-20 border-t border-white/20 bg-black">
       <div className={`py-[60px] md:py-[80px] lg:py-[100px] lg:border-x lg:border-white/20 ${CONTAINER}`}>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
           {/* Intro column */}

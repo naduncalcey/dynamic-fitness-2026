@@ -14,33 +14,62 @@ import { getLocaleFromPathname, localizeHref } from "@/lib/i18n/locale";
 
 const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
 
+// Footer links point at real destinations only (no dead `#` placeholders): the
+// gym's services don't have dedicated pages yet, so they anchor to the most
+// relevant home section (#pricing lists what each plan includes, #about
+// describes the gym), FAQs jump to the FAQ accordion, and Contact opens email.
 const linkGroups = [
   {
     titleKey: "footer.group.services",
     links: [
-      { labelKey: "footer.link.personalTraining", href: "#" },
-      { labelKey: "footer.link.hiitClasses", href: "#" },
-      { labelKey: "footer.link.pricing", href: "#pricing" },
+      { labelKey: "footer.link.personalTraining", href: "/#pricing" },
+      { labelKey: "footer.link.hiitClasses", href: "/#pricing" },
+      { labelKey: "footer.link.pricing", href: "/#pricing" },
     ],
   },
   {
     titleKey: "footer.group.resources",
     links: [
-      { labelKey: "footer.link.fitconnect", href: "#" },
-      { labelKey: "footer.link.classSchedule", href: "#" },
-      { labelKey: "footer.link.faqs", href: "#" },
+      { labelKey: "footer.link.fitconnect", href: "/#about" },
+      { labelKey: "footer.link.classSchedule", href: "/#pricing" },
+      { labelKey: "footer.link.faqs", href: "/#faq" },
     ],
   },
   {
     titleKey: "footer.group.company",
     links: [
-      { labelKey: "footer.link.about", href: "#about" },
+      { labelKey: "footer.link.about", href: "/#about" },
       { labelKey: "footer.link.careers", href: "/careers" },
       { labelKey: "footer.link.blog", href: "/blog" },
-      { labelKey: "footer.link.contact", href: "#" },
+      { labelKey: "footer.link.contact", href: "mailto:admin@dynamicfitness.lk" },
     ],
   },
 ];
+
+// Public contact details (mirrors the structured data in lib/seo.ts).
+const CONTACT_EMAIL = "admin@dynamicfitness.lk";
+const CONTACT_PHONE_DISPLAY = "+94 77 240 3117";
+const CONTACT_PHONE_HREF = "tel:+94772403117";
+const INSTAGRAM_URL = "https://www.instagram.com/dynamicfitness.lk";
+const WHATSAPP_URL = "https://wa.me/94772403117";
+
+function InstagramIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function WhatsAppIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 1.8c2.16 0 4.19.84 5.72 2.37a8.06 8.06 0 0 1 2.37 5.74c0 4.47-3.64 8.11-8.11 8.11-1.53 0-3.02-.43-4.32-1.23l-.31-.18-3.21.84.86-3.13-.2-.32a8.05 8.05 0 0 1-1.24-4.29c0-4.47 3.64-8.11 8.11-8.11zm-3.6 4.27c-.17 0-.45.06-.69.31-.24.25-.91.89-.91 2.17 0 1.28.93 2.51 1.06 2.69.13.17 1.83 2.79 4.49 3.91.63.27 1.12.43 1.5.55.63.2 1.2.17 1.66.1.51-.08 1.56-.64 1.78-1.25.22-.61.22-1.14.16-1.25-.07-.11-.24-.17-.51-.31-.27-.13-1.56-.77-1.8-.86-.24-.09-.42-.13-.59.14-.17.27-.68.86-.83 1.03-.15.17-.31.2-.57.07-.27-.14-1.13-.42-2.16-1.33-.8-.71-1.34-1.59-1.49-1.86-.16-.27-.02-.42.12-.55.12-.12.27-.31.4-.47.13-.16.17-.27.26-.45.09-.18.04-.34-.02-.48-.07-.14-.59-1.43-.81-1.96-.21-.51-.43-.44-.59-.45h-.5z" />
+    </svg>
+  );
+}
 
 const CTA_LINK = "https://calendly.com/nadun-n-dynamicfitness/30min";
 const BRAND_TEXT = "DYNAMIC";
@@ -86,7 +115,39 @@ export function Footer() {
                   {line}
                 </span>
               ))}
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="mt-3 block transition-colors hover:text-white"
+              >
+                {CONTACT_EMAIL}
+              </a>
+              <a href={CONTACT_PHONE_HREF} className="block transition-colors hover:text-white">
+                {CONTACT_PHONE_DISPLAY}
+              </a>
             </address>
+
+            {/* Social / messaging */}
+            <div className="mt-4 flex items-center gap-3">
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Dynamic Fitness on Instagram"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/40 hover:text-white"
+              >
+                <InstagramIcon />
+              </a>
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Message Dynamic Fitness on WhatsApp"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/40 hover:text-white"
+              >
+                <WhatsAppIcon />
+              </a>
+            </div>
+
             <a
               href="https://ebadge.bestweb.lk/api/v1/clicked/dynamicfitness.lk/BestWeb/2025/Rate_Us"
               target="_blank"
