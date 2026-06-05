@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RichText } from "@/components/common/RichText";
 import { BlogPostCard } from "@/components/blog/BlogPostCard";
@@ -13,6 +13,12 @@ import type { BlogListingSection } from "@/lib/sections/types";
  * intro, and a live search box; below it a responsive grid of post cards
  * (fetched during hydration, newest first) filtered client-side by the query.
  * Used on the /blog page.
+ *
+ * The page is statically prerendered (ISR), so the `useSearchParams()` read that
+ * seeds the query from `?q=` is isolated in `BlogListingInteractive` and wrapped
+ * in `<Suspense>`. The Suspense fallback renders the *unfiltered* view, so the
+ * full post grid still lands in the static HTML (good for SEO/LCP); the client
+ * then hydrates the interactive, URL-synced version.
  */
 
 type BlogListingProps = {
@@ -26,27 +32,18 @@ const BLOG_UNICORN_PROJECT_ID = "gYGCraBekUyqZWu3BIB5";
 const BLOG_UNICORN_SCRIPT_SRC =
   "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.4/dist/unicornStudio.umd.js";
 
-export function BlogListing({ section }: BlogListingProps) {
+/** Presentational view — no `useSearchParams`, so it's safe to prerender. */
+function BlogListingView({
+  section,
+  query,
+  onQueryChange,
+}: {
+  section: BlogListingSection;
+  query: string;
+  onQueryChange: (next: string) => void;
+}) {
   const { heading, description, posts } = section;
   const t = useLabels();
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
-
-  // Mirror the query into the URL (?q=) so results are shareable/bookmarkable,
-  // without scrolling or pushing a new history entry per keystroke.
-  const onQueryChange = useCallback(
-    (next: string) => {
-      setQuery(next);
-      const params = new URLSearchParams(searchParams.toString());
-      if (next.trim()) params.set("q", next);
-      else params.delete("q");
-      const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    },
-    [pathname, router, searchParams]
-  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -138,6 +135,38 @@ export function BlogListing({ section }: BlogListingProps) {
         )}
       </div>
     </section>
+  );
+}
+
+/** Interactive wrapper — seeds the query from `?q=` and mirrors it back to the URL. */
+function BlogListingInteractive({ section }: BlogListingProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
+
+  // Mirror the query into the URL (?q=) so results are shareable/bookmarkable,
+  // without scrolling or pushing a new history entry per keystroke.
+  const onQueryChange = useCallback(
+    (next: string) => {
+      setQuery(next);
+      const params = new URLSearchParams(searchParams.toString());
+      if (next.trim()) params.set("q", next);
+      else params.delete("q");
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  return <BlogListingView section={section} query={query} onQueryChange={onQueryChange} />;
+}
+
+export function BlogListing({ section }: BlogListingProps) {
+  return (
+    <Suspense fallback={<BlogListingView section={section} query="" onQueryChange={() => {}} />}>
+      <BlogListingInteractive section={section} />
+    </Suspense>
   );
 }
 

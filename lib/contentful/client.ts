@@ -27,21 +27,38 @@ const getEnv = () => {
   };
 };
 
+/**
+ * Default ISR window for published content (seconds). Pages render statically
+ * and serve from Next's Full Route Cache; this only bounds how stale content
+ * can get *if the publish webhook is ever missed*. The Contentful webhook at
+ * `/api/revalidate` busts the cache on publish, so edits normally appear at once.
+ */
+export const CONTENT_REVALIDATE_SECONDS = 3600;
+
+/**
+ * Cache tag applied to every published-content fetch. The publish webhook calls
+ * `revalidateTag(CONTENT_CACHE_TAG)` to invalidate them all in one shot.
+ */
+export const CONTENT_CACHE_TAG = "contentful";
+
 type RequestOptions = {
   preview?: boolean;
   /**
-   * Seconds to cache this response via Next's data cache. Omit (default) for
-   * always-fresh `no-store` — correct for page content. Set it for endpoints
-   * that tolerate staleness and are hit often (e.g. the sitemap) so we don't
-   * re-query Contentful on every request.
+   * Override the ISR window (seconds) for this request. Defaults to
+   * CONTENT_REVALIDATE_SECONDS. Ignored in preview (which is always `no-store`).
    */
   revalidate?: number;
+  /**
+   * Extra cache tags, added alongside the always-present CONTENT_CACHE_TAG, for
+   * more targeted on-demand revalidation if ever needed.
+   */
+  tags?: string[];
 };
 
 export async function contentfulFetch<T>(
   query: string,
   variables: Record<string, unknown> = {},
-  { preview = false, revalidate }: RequestOptions = {}
+  { preview = false, revalidate, tags }: RequestOptions = {}
 ): Promise<T> {
   const env = getEnv();
   const token = preview ? env.previewToken : env.deliveryToken;
@@ -60,9 +77,16 @@ export async function contentfulFetch<T>(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query, variables }),
-    ...(typeof revalidate === "number"
-      ? { next: { revalidate } }
-      : { cache: "no-store" as const }),
+    // Preview/draft content must always be fresh; published content is cached
+    // (ISR) and tagged so the publish webhook can revalidate it on demand.
+    ...(preview
+      ? { cache: "no-store" as const }
+      : {
+          next: {
+            revalidate: revalidate ?? CONTENT_REVALIDATE_SECONDS,
+            tags: [CONTENT_CACHE_TAG, ...(tags ?? [])],
+          },
+        }),
   });
 
   if (!res.ok) {

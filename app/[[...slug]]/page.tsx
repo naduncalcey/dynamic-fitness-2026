@@ -4,9 +4,10 @@ import { getFlexiblePageBySlug } from "@/lib/contentful/pages";
 import { getBlogPostBySlug } from "@/lib/contentful/blog";
 import { SectionsRenderer } from "@/lib/sections/SectionsRenderer";
 import { BlogPostTemplate } from "@/components/templates/BlogPost";
-import { splitLocaleFromSlug } from "@/lib/i18n/locale";
+import { splitLocaleFromSlug, LOCALE_MAP, DEFAULT_LOCALE } from "@/lib/i18n/locale";
 import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/common/JsonLd";
+import { getFlexiblePageEntries, getBlogPostEntries } from "@/lib/contentful/sitemap";
 import type { Section, SeoEntry } from "@/lib/sections/types";
 
 /** Collect Q&A items from any "Accordion - FAQ" sections on the page. */
@@ -20,7 +21,40 @@ const collectFaqItems = (sections: Section[]) =>
     )
     .flatMap((s) => s.items ?? []);
 
-export const dynamic = "force-dynamic";
+// Pages render statically and serve from the Full Route Cache (ISR). The
+// Contentful fetches behind them are cached + tagged (see lib/contentful/client),
+// and a publish webhook (/api/revalidate) busts that cache on demand — so edits
+// appear immediately. This `revalidate` is only the fallback refresh window if a
+// webhook is ever missed.
+export const revalidate = 3600;
+
+/**
+ * Prerender every known page at build time so they're served as static HTML
+ * (Full Route Cache + ISR) instead of rendered per request. Without this, a
+ * catch-all segment can't be prerendered and stays fully dynamic. Each base path
+ * is expanded across locales (default = no prefix, others = `/<urlSlug>/…`).
+ *
+ * Pages published after the last build (or any noindex pages the sitemap helpers
+ * skip) aren't listed here — `dynamicParams` (default true) still renders them
+ * on demand, then caches the result, and the publish webhook keeps them fresh.
+ */
+export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
+  const [pages, posts] = await Promise.all([
+    getFlexiblePageEntries(),
+    getBlogPostEntries(),
+  ]);
+
+  // Base paths as segment arrays, no locale prefix. "/" → [], "/careers" → ["careers"].
+  const basePaths: string[][] = [
+    ...pages.map((p) => p.slug.replace(/^\/+/, "").split("/").filter(Boolean)),
+    ...posts.map((post) => ["blog", post.slug.replace(/^\/+/, "")]),
+  ];
+
+  return LOCALE_MAP.flatMap((locale) => {
+    const prefix = locale.urlSlug === DEFAULT_LOCALE.urlSlug ? [] : [locale.urlSlug];
+    return basePaths.map((segs) => ({ slug: [...prefix, ...segs] }));
+  });
+}
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;
