@@ -7,6 +7,8 @@ import { CookieConsent } from "@/components/common/CookieConsent";
 import { JsonLd } from "@/components/common/JsonLd";
 import { organizationJsonLd, webSiteJsonLd, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { LabelsProvider } from "@/lib/i18n/LabelsProvider";
+import { DEFAULT_LOCALE } from "@/lib/i18n/locale";
+import { HtmlLangSync } from "@/components/common/HtmlLangSync";
 import { getAllUiLabels } from "@/lib/contentful/uiLabels";
 import "./globals.css";
 
@@ -56,10 +58,12 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang={DEFAULT_LOCALE.htmlLang}
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        {/* Sync <html lang> to the URL locale on the client (keeps ISR static). */}
+        <HtmlLangSync />
         {/* Sitewide structured data: brand entity + search endpoint. */}
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={webSiteJsonLd()} />
