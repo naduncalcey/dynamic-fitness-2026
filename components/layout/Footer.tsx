@@ -30,7 +30,8 @@ const linkGroups = [
   {
     titleKey: "footer.group.resources",
     links: [
-      { labelKey: "footer.link.fitconnect", href: "/#about" },
+      // FitConnect partner app — same URL as the logo carousel (Hero/LogoScroll).
+      { labelKey: "footer.link.fitconnect", href: "https://fitconnect.me" },
       { labelKey: "footer.link.classSchedule", href: "/#pricing" },
       { labelKey: "footer.link.faqs", href: "/#faq" },
     ],
@@ -41,7 +42,7 @@ const linkGroups = [
       { labelKey: "footer.link.about", href: "/#about" },
       { labelKey: "footer.link.careers", href: "/careers" },
       { labelKey: "footer.link.blog", href: "/blog" },
-      { labelKey: "footer.link.contact", href: "mailto:admin@dynamicfitness.lk" },
+      { labelKey: "footer.link.contact", href: "/contact" },
     ],
   },
 ];
@@ -171,16 +172,20 @@ export function Footer() {
                 {t(group.titleKey)}
               </p>
               <ul className="flex flex-col gap-3">
-                {group.links.map((link) => (
-                  <li key={link.labelKey}>
-                    <a
-                      href={localizeHref(link.href, current)}
-                      className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
-                    >
-                      {t(link.labelKey)}
-                    </a>
-                  </li>
-                ))}
+                {group.links.map((link) => {
+                  const isExternal = /^https?:/i.test(link.href);
+                  return (
+                    <li key={link.labelKey}>
+                      <a
+                        href={localizeHref(link.href, current)}
+                        {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
+                        className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+                      >
+                        {t(link.labelKey)}
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

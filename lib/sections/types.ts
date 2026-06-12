@@ -131,6 +131,17 @@ export type CareersFormSection = BaseSection & {
   successMessage: string | null;
 };
 
+/** Variant values for the ContactForm `frontEndComponent` field. */
+export type ContactFormFrontEndComponent = "Contact Form";
+
+export type ContactFormSection = BaseSection & {
+  type: "contactForm";
+  frontEndComponent: ContactFormFrontEndComponent | string | null;
+  heading: string | null;
+  description: RichTextField | null;
+  successMessage: string | null;
+};
+
 /** Variant values for the BlogListing `frontEndComponent` field. */
 export type BlogListingFrontEndComponent = "Blog Listing - Default";
 
@@ -150,4 +161,5 @@ export type Section =
   | AccordionSection
   | BannerSection
   | CareersFormSection
+  | ContactFormSection
   | BlogListingSection;

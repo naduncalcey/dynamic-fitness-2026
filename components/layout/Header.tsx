@@ -27,6 +27,7 @@ const navLinks = [
   { labelKey: "nav.pricing", href: "/#pricing" },
   { labelKey: "nav.blog", href: "/blog" },
   { labelKey: "nav.careers", href: "/careers" },
+  { labelKey: "nav.contact", href: "/contact" },
 ];
 
 function GlobeIcon() {
