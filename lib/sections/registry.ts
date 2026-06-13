@@ -6,6 +6,7 @@ import { accordionSection } from "./definitions/accordion";
 import { bannerSection } from "./definitions/banner";
 import { careersFormSection } from "./definitions/careersForm";
 import { contactFormSection } from "./definitions/contactForm";
+import { jobListingsSection } from "./definitions/jobListings";
 import { blogListingSection } from "./definitions/blogListing";
 
 /**
@@ -27,5 +28,6 @@ export const sectionRegistry: SectionDefinition[] = [
   bannerSection,
   careersFormSection,
   contactFormSection,
+  jobListingsSection,
   blogListingSection,
 ];

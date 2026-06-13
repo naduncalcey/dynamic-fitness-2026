@@ -7,7 +7,7 @@ import type {
   RichTextField,
   VideoEntry,
 } from "@/lib/contentful/common/types";
-import type { BlogPostCard } from "@/lib/contentful/blog/types";
+import type { AuthorEntry, BlogPostCard } from "@/lib/contentful/blog/types";
 
 export type ImageAsset = {
   url: string | null;
@@ -107,7 +107,7 @@ export type AccordionSection = BaseSection & {
 };
 
 /** Variant values for the Banner `frontEndComponent` field. */
-export type BannerFrontEndComponent = "Banner - CTA";
+export type BannerFrontEndComponent = "Banner - CTA" | "Banner / Team";
 
 export type BannerSection = BaseSection & {
   type: "banner";
@@ -117,6 +117,11 @@ export type BannerSection = BaseSection & {
   description: RichTextField | null;
   cta: CtaEntry | null;
   backgroundImage: ImageEntry | null;
+  /**
+   * Team members for the "Banner / Team" variant. Reuses the Author content
+   * type so each person doubles as a blog author (name, role, avatar).
+   */
+  teamMembers: AuthorEntry[];
 };
 
 /** Variant values for the CareersForm `frontEndComponent` field. */
@@ -142,6 +147,34 @@ export type ContactFormSection = BaseSection & {
   successMessage: string | null;
 };
 
+/** A single job opening (the `job` content type), listed by JobListings. */
+export type JobEntry = {
+  id: string;
+  title: string | null;
+  slug: string | null;
+  employmentType: string | null;
+  location: string | null;
+  department: string | null;
+  summary: string | null;
+  description: RichTextField | null;
+  responsibilities: string[];
+  requirements: string[];
+  compensation: string | null;
+  postedDate: string | null;
+};
+
+/** Variant values for the JobListings `frontEndComponent` field. */
+export type JobListingsFrontEndComponent = "Job Listings";
+
+export type JobListingsSection = BaseSection & {
+  type: "jobListings";
+  frontEndComponent: JobListingsFrontEndComponent | string | null;
+  heading: string | null;
+  description: RichTextField | null;
+  emptyMessage: string | null;
+  jobs: JobEntry[];
+};
+
 /** Variant values for the BlogListing `frontEndComponent` field. */
 export type BlogListingFrontEndComponent = "Blog Listing - Default";
 
@@ -162,4 +195,5 @@ export type Section =
   | BannerSection
   | CareersFormSection
   | ContactFormSection
+  | JobListingsSection
   | BlogListingSection;

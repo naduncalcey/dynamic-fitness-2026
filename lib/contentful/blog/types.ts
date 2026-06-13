@@ -5,8 +5,21 @@ export type AuthorEntry = {
   sys: { id: string };
   name?: string | null;
   role?: string | null;
+  /** External image URL fallback. */
   avatarUrl?: string | null;
+  /** Uploaded Contentful asset; takes precedence over `avatarUrl`. */
+  avatarImage?: { url?: string | null } | null;
 };
+
+/**
+ * The effective avatar URL for an author: an uploaded image asset wins over the
+ * external URL link, so editors can use whichever they prefer.
+ */
+export function authorAvatarUrl(
+  author: Pick<AuthorEntry, "avatarUrl" | "avatarImage"> | null | undefined
+): string | null {
+  return author?.avatarImage?.url ?? author?.avatarUrl ?? null;
+}
 
 /** Lightweight fields for listing cards. */
 export type BlogPostCard = {

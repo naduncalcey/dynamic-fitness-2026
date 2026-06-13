@@ -503,7 +503,8 @@ const ACCORDION_TYPE = {
  */
 const BANNER_TYPE = {
   name: "Banner",
-  description: "Banner section: background image + overlay, headline, description, CTA.",
+  description:
+    "Banner section. Variants: 'Banner - CTA' (background image + overlay, headline, description, CTA) and 'Banner / Team' (a grid of team-member cards backed by Author entries).",
   displayField: "internalName",
   fields: [
     { id: "internalName", name: "Internal Name", type: "Symbol", required: true },
@@ -511,7 +512,7 @@ const BANNER_TYPE = {
       id: "frontEndComponent",
       name: "Frontend Component",
       type: "Symbol",
-      validations: [{ in: ["Banner - CTA"] }],
+      validations: [{ in: ["Banner - CTA", "Banner / Team"] }],
     },
     { id: "headline", name: "Headline", type: "Symbol" },
     { id: "highlightWord", name: "Highlight Word", type: "Symbol" },
@@ -529,6 +530,14 @@ const BANNER_TYPE = {
       type: "Link",
       linkType: "Entry",
       validations: [{ linkContentType: ["image"] }],
+    },
+    {
+      // "Banner / Team" only. Reuses the Author content type so a team member
+      // doubles as a blog author (no separate content type — see the 25-type cap).
+      id: "teamMembers",
+      name: "Team Members",
+      type: "Array",
+      items: { type: "Link", linkType: "Entry", validations: [{ linkContentType: ["author"] }] },
     },
   ],
 };
@@ -562,17 +571,21 @@ const CAREERS_FORM_TYPE = {
 };
 
 /*
- * Blog author — referenced by blog posts. avatarUrl is an external image URL.
+ * Blog author — referenced by blog posts (and reused for team-member cards).
+ * The avatar can be set two ways: avatarImage (an uploaded Contentful asset)
+ * takes precedence over avatarUrl (an external image URL). See authorAvatarUrl()
+ * in lib/contentful/blog/types.ts.
  */
 const AUTHOR_TYPE = {
   name: "Author",
-  description: "Blog author (name, role, avatar).",
+  description: "Blog author / team member (name, role, avatar — uploaded image or external URL).",
   displayField: "internalName",
   fields: [
     { id: "internalName", name: "Internal Name", type: "Symbol", required: true },
     { id: "name", name: "Name", type: "Symbol" },
     { id: "role", name: "Role", type: "Symbol" },
     { id: "avatarUrl", name: "Avatar URL", type: "Symbol" },
+    { id: "avatarImage", name: "Avatar Image", type: "Link", linkType: "Asset" },
   ],
 };
 
@@ -1679,7 +1692,7 @@ await upsertEntry("cta", "cta-careers-apply", {
   variant: L("Red"),
   size: L("Medium"),
   linkBehavior: L("External"),
-  externalLink: L("#careers"),
+  externalLink: L("#open-positions"),
   newTab: L(false),
   showArrow: L(true),
 });
@@ -1711,7 +1724,13 @@ await upsertEntry("flexiblePage", "careers", {
   slug: L("/careers"),
   pageTitle: L("Careers"),
   seo: L(entryLink("seo-careers")),
-  sections: L([entryLink("banner-careers"), entryLink("careers-form")]),
+  // Banner hero only is seeded here. The careers-form ("Join the team") section
+  // is intentionally not linked — it was removed from the page (the careersForm
+  // entry above is still seeded so it can be re-linked later). The live page
+  // also has a "Banner / Team" section (banner-team) and the job-listings
+  // section; both are managed directly in Contentful (added after this seed was
+  // written), so they are not listed here.
+  sections: L([entryLink("banner-careers")]),
 });
 
 console.log(

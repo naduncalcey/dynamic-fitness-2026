@@ -6,7 +6,7 @@ import type { BannerSection } from "@/lib/sections/types";
 /**
  * Banner - CTA. Recreates the old site's closing call-to-action: a background
  * image with a heavy dark overlay, a centered headline with a red-gradient
- * serif-italic highlight word ending in "?", a description, and a red CTA.
+ * serif-italic highlight word, a description, and a red CTA.
  */
 
 type BannerCtaProps = {
@@ -46,7 +46,6 @@ export function BannerCta({ section }: BannerCtaProps) {
                 </span>
               </>
             ) : null}
-            ?
           </h2>
 
           {description ? (

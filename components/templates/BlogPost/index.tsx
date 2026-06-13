@@ -3,7 +3,7 @@ import { RichText } from "@/components/common/RichText";
 import { formatBlogDate } from "@/components/blog/formatBlogDate";
 import { BackToBlogLink } from "./BackToBlogLink";
 import { blogPostJsonLd } from "@/lib/seo";
-import type { BlogPostEntry } from "@/lib/contentful/blog/types";
+import { authorAvatarUrl, type BlogPostEntry } from "@/lib/contentful/blog/types";
 
 /**
  * Blog post detail template (fixed layout, not section-driven): a header with
@@ -44,11 +44,11 @@ export function BlogPostTemplate({ post }: BlogPostTemplateProps) {
           </h1>
 
           <div className="mt-6 flex items-center gap-3 text-sm text-white/50">
-            {author?.avatarUrl ? (
+            {authorAvatarUrl(author) ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={author.avatarUrl}
-                alt={author.name ?? ""}
+                src={authorAvatarUrl(author)!}
+                alt={author?.name ?? ""}
                 width={36}
                 height={36}
                 className="h-9 w-9 rounded-full object-cover"

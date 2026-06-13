@@ -5,7 +5,7 @@ import { getBlogPostBySlug } from "@/lib/contentful/blog";
 import { SectionsRenderer } from "@/lib/sections/SectionsRenderer";
 import { BlogPostTemplate } from "@/components/templates/BlogPost";
 import { splitLocaleFromSlug, LOCALE_MAP, DEFAULT_LOCALE } from "@/lib/i18n/locale";
-import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd } from "@/lib/seo";
+import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd, jobPostingsJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/common/JsonLd";
 import { getFlexiblePageEntries, getBlogPostEntries } from "@/lib/contentful/sitemap";
 import type { Section, SeoEntry } from "@/lib/sections/types";
@@ -20,6 +20,12 @@ const collectFaqItems = (sections: Section[]) =>
         s.frontEndComponent.includes("FAQ")
     )
     .flatMap((s) => s.items ?? []);
+
+/** Collect job openings from any JobListings sections on the page. */
+const collectJobs = (sections: Section[]) =>
+  sections
+    .filter((s): s is Extract<Section, { type: "jobListings" }> => s.type === "jobListings")
+    .flatMap((s) => s.jobs ?? []);
 
 // Pages render statically and serve from the Full Route Cache (ISR). The
 // Contentful fetches behind them are cached + tagged (see lib/contentful/client),
@@ -156,6 +162,7 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
   if (!page) notFound();
 
   const faq = faqJsonLd(collectFaqItems(page.sections));
+  const jobPostings = jobPostingsJsonLd(collectJobs(page.sections));
 
   return (
     <main lang={locale.htmlLang}>
@@ -163,6 +170,10 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
       {path === "/" ? <JsonLd data={gymJsonLd()} /> : null}
       {/* FAQPage structured data when the page has an FAQ accordion. */}
       {faq ? <JsonLd data={faq} /> : null}
+      {/* JobPosting structured data, one per open role (e.g. the careers page). */}
+      {jobPostings.map((posting, i) => (
+        <JsonLd key={`job-${i}`} data={posting} />
+      ))}
       <SectionsRenderer sections={page.sections} />
     </main>
   );

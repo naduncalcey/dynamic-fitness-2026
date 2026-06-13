@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { BlogPostEntry } from "@/lib/contentful/blog/types";
+import type { JobEntry } from "@/lib/sections/types";
 
 /**
  * Site-level SEO constants + helpers shared across routes. The base URL drives
@@ -269,6 +270,80 @@ export function richTextToPlainText(field?: { json?: unknown } | null): string {
   };
   walk(root);
   return out.join("").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+// schema.org employmentType expects these enum strings; map from our CMS values.
+const EMPLOYMENT_TYPE_MAP: Record<string, string> = {
+  "Full-time": "FULL_TIME",
+  "Part-time": "PART_TIME",
+  Contract: "CONTRACTOR",
+  Internship: "INTERN",
+  Volunteer: "VOLUNTEER",
+};
+
+const escHtml = (s: string) =>
+  s.replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string
+  );
+
+/**
+ * JobPosting JSON-LD, one object per open role on the careers page (Google for
+ * Jobs eligibility). Builds an HTML `description` from the job's summary, body,
+ * responsibilities, and requirements. Skips jobs missing a title. The job's
+ * `url` deep-links to its card anchor (`/careers#job-<slug>`).
+ */
+export function jobPostingsJsonLd(jobs: JobEntry[]): Record<string, unknown>[] {
+  return jobs
+    .filter((job) => job.title)
+    .map((job) => {
+      const bodyText = richTextToPlainText(job.description);
+      const list = (items: string[]) =>
+        items.length ? `<ul>${items.map((i) => `<li>${escHtml(i)}</li>`).join("")}</ul>` : "";
+      const description = [
+        job.summary ? `<p>${escHtml(job.summary)}</p>` : "",
+        bodyText ? `<p>${escHtml(bodyText)}</p>` : "",
+        list(job.responsibilities),
+        list(job.requirements),
+      ]
+        .filter(Boolean)
+        .join("");
+
+      const url = job.slug ? absoluteUrl(`/careers#job-${job.slug}`) : absoluteUrl("/careers");
+
+      return {
+        "@context": "https://schema.org",
+        "@type": "JobPosting",
+        title: job.title ?? undefined,
+        description: description || escHtml(job.title ?? ""),
+        datePosted: job.postedDate ?? undefined,
+        employmentType: job.employmentType
+          ? EMPLOYMENT_TYPE_MAP[job.employmentType] ?? job.employmentType
+          : undefined,
+        identifier: {
+          "@type": "PropertyValue",
+          name: SITE_NAME,
+          value: job.slug ?? job.title ?? undefined,
+        },
+        hiringOrganization: {
+          "@type": "Organization",
+          name: SITE_NAME,
+          sameAs: SITE_URL,
+          logo: absoluteUrl("/logo.png"),
+        },
+        jobLocation: {
+          "@type": "Place",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: BUSINESS.address.street,
+            addressLocality: BUSINESS.address.locality,
+            addressRegion: BUSINESS.address.region,
+            addressCountry: BUSINESS.address.country,
+          },
+        },
+        directApply: true,
+        url,
+      };
+    });
 }
 
 type FaqItem = { question?: string | null; answer?: { json?: unknown } | null };

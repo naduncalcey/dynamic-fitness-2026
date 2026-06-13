@@ -4,6 +4,7 @@ import { Banner } from "@/components/sections/Banner";
 import type { SectionDefinition } from "@/lib/sections/config";
 import type { BannerSection } from "@/lib/sections/types";
 import type { CtaEntry, ImageEntry, RichTextField } from "@/lib/contentful/common/types";
+import type { AuthorEntry } from "@/lib/contentful/blog/types";
 
 type BannerResponse = {
   banner?: {
@@ -14,6 +15,7 @@ type BannerResponse = {
     description?: RichTextField | null;
     cta?: CtaEntry | null;
     backgroundImage?: ImageEntry | null;
+    teamMembersCollection?: { items: (AuthorEntry | null)[] } | null;
   } | null;
 };
 
@@ -40,6 +42,9 @@ export const bannerSection: SectionDefinition = {
         description: entry.description ?? null,
         cta: entry.cta ?? null,
         backgroundImage: entry.backgroundImage ?? null,
+        teamMembers: (entry.teamMembersCollection?.items ?? []).filter(
+          (m): m is AuthorEntry => Boolean(m)
+        ),
       } satisfies BannerSection;
     } catch (error) {
       console.error(`Failed to hydrate Banner (${id}):`, error);
