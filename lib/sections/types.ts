@@ -56,6 +56,9 @@ export type HeroSection = BaseSection & {
   ctas: CtaEntry[];
 };
 
+/** A single metric in the Info "Image Explainer" stats band. */
+export type InfoStat = { label: string; value: string };
+
 /** Variant values for the Info `frontEndComponent` field. */
 export type InfoFrontEndComponent =
   | "Info - Image Explainer"
@@ -73,6 +76,8 @@ export type InfoSection = BaseSection & {
   body: RichTextField | null;
   // Image Explainer
   description: RichTextField | null;
+  /** Metrics band rendered under the About text (label + value pairs). */
+  stats: InfoStat[];
   imageTooltips: string[];
   cta: CtaEntry | null;
   mainImage: ImageEntry | null;
@@ -107,7 +112,7 @@ export type AccordionSection = BaseSection & {
 };
 
 /** Variant values for the Banner `frontEndComponent` field. */
-export type BannerFrontEndComponent = "Banner - CTA" | "Banner / Team";
+export type BannerFrontEndComponent = "Banner - CTA" | "Banner / Team" | "Banner / Map";
 
 export type BannerSection = BaseSection & {
   type: "banner";
@@ -117,6 +122,8 @@ export type BannerSection = BaseSection & {
   description: RichTextField | null;
   cta: CtaEntry | null;
   backgroundImage: ImageEntry | null;
+  /** Google Maps embed URL for the "Banner / Map" variant. */
+  mapEmbedUrl: string | null;
   /**
    * Team members for the "Banner / Team" variant. Reuses the Author content
    * type so each person doubles as a blog author (name, role, avatar).
@@ -160,7 +167,10 @@ export type JobEntry = {
   responsibilities: string[];
   requirements: string[];
   compensation: string | null;
+  /** Raw ISO date (used for JobPosting structured data). */
   postedDate: string | null;
+  /** Locale-formatted posted date, pre-rendered server-side for hydration safety. */
+  postedDisplay: string | null;
 };
 
 /** Variant values for the JobListings `frontEndComponent` field. */

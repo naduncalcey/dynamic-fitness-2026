@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { Cta } from "@/components/common/Cta";
 import { RichText } from "@/components/common/RichText";
+import { SkeletonImage } from "@/components/common/SkeletonImage";
 import type { BannerSection } from "@/lib/sections/types";
 
 /**
@@ -25,12 +25,13 @@ export function BannerCta({ section }: BannerCtaProps) {
         className={`relative z-0 overflow-hidden py-[80px] md:py-[120px] lg:py-[160px] lg:border-x lg:border-white/20 ${CONTAINER}`}
       >
         {bgUrl ? (
-          <Image
+          <SkeletonImage
+            kind="fill"
+            wrapperClassName="absolute inset-0 z-0"
             src={bgUrl}
             alt={backgroundImage?.altText ?? ""}
-            fill
             sizes="(max-width: 1240px) 100vw, 1240px"
-            className="z-0 object-cover object-center"
+            className="object-cover object-center"
           />
         ) : null}
         <div className="pointer-events-none absolute inset-0 z-[1] bg-black/75" />

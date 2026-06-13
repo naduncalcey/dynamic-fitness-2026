@@ -2,7 +2,7 @@ import { contentfulFetch } from "@/lib/contentful/client";
 import { INFO_BY_ID } from "@/lib/contentful/graphql/queries/info";
 import { Info } from "@/components/sections/Info";
 import type { SectionDefinition } from "@/lib/sections/config";
-import type { InfoSection } from "@/lib/sections/types";
+import type { InfoSection, InfoStat } from "@/lib/sections/types";
 import type {
   CtaEntry,
   ImageEntry,
@@ -20,6 +20,7 @@ type InfoResponse = {
     headlineFaded?: string | null;
     body?: RichTextField | null;
     description?: RichTextField | null;
+    stats?: unknown;
     imageTooltips?: Array<string | null> | null;
     cta?: CtaEntry | null;
     mainImage?: ImageEntry | null;
@@ -32,6 +33,16 @@ type InfoResponse = {
 
 const cleanPlans = (items?: Array<PricingPlanEntry | null> | null): PricingPlanEntry[] =>
   (items ?? []).filter((p): p is PricingPlanEntry => p !== null);
+
+// `stats` is a free-form JSON Object field; coerce it to label/value strings and
+// drop anything malformed so a bad edit can't break the render.
+const cleanStats = (raw: unknown): InfoStat[] => {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((s): s is Record<string, unknown> => Boolean(s) && typeof s === "object")
+    .map((s) => ({ label: String(s.label ?? ""), value: String(s.value ?? "") }))
+    .filter((s) => s.label !== "" || s.value !== "");
+};
 
 export const infoSection: SectionDefinition = {
   contentfulTypename: "Info",
@@ -57,6 +68,7 @@ export const infoSection: SectionDefinition = {
         headlineFaded: entry.headlineFaded ?? null,
         body: entry.body ?? null,
         description: entry.description ?? null,
+        stats: cleanStats(entry.stats),
         imageTooltips: (entry.imageTooltips ?? []).filter(
           (t): t is string => typeof t === "string"
         ),

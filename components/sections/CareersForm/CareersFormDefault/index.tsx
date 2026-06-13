@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Script from "next/script";
 import { RichText } from "@/components/common/RichText";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
+import { ChevronDown } from "lucide-react";
 import type { CareersFormSection } from "@/lib/sections/types";
 
 /**
@@ -139,16 +140,11 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
                       ))}
                       <option value="General Application">{t("careers.generalApplication")}</option>
                     </select>
-                    <svg
+                    <ChevronDown
                       aria-hidden
                       className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      stroke="currentColor"
                       strokeWidth={1.5}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
-                    </svg>
+                    />
                   </div>
                 </div>
               </div>

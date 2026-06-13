@@ -13,6 +13,8 @@ export type FlexiblePage = {
   sys: { id: string };
   slug: string;
   pageTitle: string | null;
+  /** Contentful toggle: render the floating back-to-top button on this page. */
+  showBackToTop: boolean;
   seo: SeoEntry | null;
   sections: Section[];
 };
@@ -23,6 +25,7 @@ type FlexiblePageBySlugResponse = {
       sys: { id: string };
       slug: string;
       pageTitle?: string | null;
+      showBackToTop?: boolean | null;
       seo?: SeoEntry | null;
       sectionsCollection?: {
         items?: Array<SectionStub | null> | null;
@@ -93,6 +96,7 @@ export const getFlexiblePageBySlug = async (
     sys: page.sys,
     slug: page.slug,
     pageTitle: page.pageTitle ?? null,
+    showBackToTop: page.showBackToTop ?? false,
     seo: page.seo ?? null,
     sections,
   };

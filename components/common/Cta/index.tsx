@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, type MouseEvent } from "react";
+import { ArrowRight } from "lucide-react";
 import type { CtaEntry, CtaSize, CtaVariant } from "@/lib/contentful/common/types";
 import {
   isExternalHref,
@@ -102,7 +103,7 @@ export function Cta({ cta, className = "" }: CtaProps) {
           aria-hidden
           className="pointer-events-none relative transition-transform duration-300 group-hover/cta:translate-x-1"
         >
-          →
+          <ArrowRight className="h-[1em] w-[1em]" strokeWidth={1.5} />
         </span>
       ) : null}
     </>

@@ -24,6 +24,7 @@ export const BANNER_BY_ID = /* GraphQL */ `
       frontEndComponent
       headline
       highlightWord
+      mapEmbedUrl
       ${richTextJson("description")}
       cta {
         ...CtaFields

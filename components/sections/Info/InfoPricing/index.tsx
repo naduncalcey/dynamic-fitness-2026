@@ -6,6 +6,7 @@ import { PRICING_VIEW_COOKIE, getCookie, setCookie } from "@/lib/cookies";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
 import type { CtaEntry, PricingPlanEntry } from "@/lib/contentful/common/types";
 import type { InfoSection } from "@/lib/sections/types";
+import { CircleCheck } from "lucide-react";
 
 /**
  * Info - Pricing. Recreates the old site's membership section: number/label
@@ -25,18 +26,10 @@ const isAccentFeature = (text: string) => /^everything in/i.test(text.trim());
 
 function CheckIcon({ accent }: { accent: boolean }) {
   return (
-    <svg
+    <CircleCheck
       className={`mt-0.5 h-4 w-4 shrink-0 ${accent ? "text-red-500" : "text-white/40"}`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
+      strokeWidth={1.5}
+    />
   );
 }
 

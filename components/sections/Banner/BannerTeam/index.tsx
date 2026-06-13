@@ -1,4 +1,5 @@
 import { RichText } from "@/components/common/RichText";
+import { SkeletonImage } from "@/components/common/SkeletonImage";
 import type { BannerSection } from "@/lib/sections/types";
 import { authorAvatarUrl, type AuthorEntry } from "@/lib/contentful/blog/types";
 
@@ -40,12 +41,12 @@ function TeamCard({ member, index }: { member: AuthorEntry; index: number }) {
     >
       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-white/[0.04]">
         {avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <SkeletonImage
+            kind="plain"
+            wrapperClassName="h-full w-full"
             src={avatar}
             alt={member.name ?? ""}
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-            loading="lazy"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center font-mono text-2xl tracking-[0.15em] text-white/30">

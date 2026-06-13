@@ -7,6 +7,7 @@ import { BlogPostTemplate } from "@/components/templates/BlogPost";
 import { splitLocaleFromSlug, LOCALE_MAP, DEFAULT_LOCALE } from "@/lib/i18n/locale";
 import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd, jobPostingsJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/common/JsonLd";
+import { BackToTop } from "@/components/common/BackToTop";
 import { getFlexiblePageEntries, getBlogPostEntries } from "@/lib/contentful/sitemap";
 import type { Section, SeoEntry } from "@/lib/sections/types";
 
@@ -175,6 +176,7 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
         <JsonLd key={`job-${i}`} data={posting} />
       ))}
       <SectionsRenderer sections={page.sections} />
+      {page.showBackToTop ? <BackToTop /> : null}
     </main>
   );
 }

@@ -1,4 +1,7 @@
+"use client";
+
 import NextImage from "next/image";
+import { useState } from "react";
 import type { AssetEntry, ImageEntry } from "@/lib/contentful/common/types";
 
 /**
@@ -6,6 +9,11 @@ import type { AssetEntry, ImageEntry } from "@/lib/contentful/common/types";
  * present it is art-directed in below the `md` breakpoint; otherwise the
  * `desktop` asset is used at all sizes. SVGs bypass next/image (which would
  * rasterize them) and render as a plain <img>.
+ *
+ * An animated skeleton is shown behind the image until it loads (see the
+ * `.ds-skeleton` styles in globals.css): the figure is the relative box, the
+ * skeleton pins `absolute inset-0`, and each image is `relative` so it paints
+ * over the skeleton, which fades out once any image finishes loading.
  */
 
 type ResponsiveImageProps = {
@@ -27,18 +35,29 @@ function Asset({
   sizes,
   priority,
   className,
+  onReady,
 }: {
   asset: AssetEntry;
   alt: string;
   sizes: string;
   priority: boolean;
   className: string;
+  onReady: () => void;
 }) {
   if (!asset.url) return null;
 
   if (isSvg(asset)) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={asset.url} alt={alt} className={className} loading={priority ? "eager" : "lazy"} />;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={asset.url}
+        alt={alt}
+        className={className}
+        loading={priority ? "eager" : "lazy"}
+        onLoad={onReady}
+        onError={onReady}
+      />
+    );
   }
 
   return (
@@ -50,6 +69,8 @@ function Asset({
       sizes={sizes}
       priority={priority}
       className={className}
+      onLoad={onReady}
+      onError={onReady}
     />
   );
 }
@@ -61,6 +82,9 @@ export function ResponsiveImage({
   sizes = "100vw",
   priority,
 }: ResponsiveImageProps) {
+  const [loaded, setLoaded] = useState(false);
+  const onReady = () => setLoaded(true);
+
   const desktop = image?.desktop;
   if (!desktop?.url) return null;
 
@@ -69,21 +93,34 @@ export function ResponsiveImage({
   const mobile = image.mobile;
 
   return (
-    <figure className={className}>
+    <figure className={`relative ${className ?? ""}`.trim()}>
+      <span
+        aria-hidden
+        className={`ds-skeleton pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+          loaded ? "opacity-0" : "opacity-100"
+        }`}
+      />
       {mobile?.url ? (
         <>
-          <span className="hidden md:block">
-            <Asset asset={desktop} alt={alt} sizes={sizes} priority={isPriority} className={imgClassName} />
+          <span className="relative hidden md:block">
+            <Asset asset={desktop} alt={alt} sizes={sizes} priority={isPriority} className={imgClassName} onReady={onReady} />
           </span>
-          <span className="block md:hidden">
-            <Asset asset={mobile} alt={alt} sizes={sizes} priority={isPriority} className={imgClassName} />
+          <span className="relative block md:hidden">
+            <Asset asset={mobile} alt={alt} sizes={sizes} priority={isPriority} className={imgClassName} onReady={onReady} />
           </span>
         </>
       ) : (
-        <Asset asset={desktop} alt={alt} sizes={sizes} priority={isPriority} className={imgClassName} />
+        <Asset
+          asset={desktop}
+          alt={alt}
+          sizes={sizes}
+          priority={isPriority}
+          className={`${imgClassName} relative`}
+          onReady={onReady}
+        />
       )}
       {image.caption ? (
-        <figcaption className="mt-2 text-sm text-[var(--text-muted)]">{image.caption}</figcaption>
+        <figcaption className="relative mt-2 text-sm text-[var(--text-muted)]">{image.caption}</figcaption>
       ) : null}
     </figure>
   );

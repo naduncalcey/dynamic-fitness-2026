@@ -6,6 +6,7 @@ import { RichText } from "@/components/common/RichText";
 import { BlogPostCard } from "@/components/blog/BlogPostCard";
 import { UnicornBackground } from "@/components/sections/Hero/UnicornBackground";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
+import { Search } from "lucide-react";
 import type { BlogListingSection } from "@/lib/sections/types";
 
 /**
@@ -95,16 +96,11 @@ function BlogListingView({
 
             {/* Search */}
             <div className="relative mx-auto mt-8 max-w-md">
-              <svg
+              <Search
                 className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
+                strokeWidth={1.5}
                 aria-hidden
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-              </svg>
+              />
               <input
                 type="search"
                 value={query}

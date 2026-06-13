@@ -214,6 +214,20 @@ const T = {
       "ඔවුන්ගේ ඉලක්ක සපුරා ගැනීමට සහ සම්පූර්ණ හැකියාව මුදා හැරීමට Dynamic Fitness හි දැනට පුහුණු වන යෝග්‍යතා ලෝලීන් සිය ගණනකට එක්වන්න."
     ),
   },
+  // "Banner / Team" on /careers — heading renders "අපගේ කණ්ඩායම".
+  "banner-team": {
+    headline: "අපගේ",
+    highlightWord: "කණ්ඩායම",
+    description: RT(
+      "Dynamic Fitness පිටුපස සිටින පුහුණුකරුවෝ සහ කාර්ය මණ්ඩලය — සෑම පියවරකදීම ඔබේ පුහුණුව, තාක්ෂණය සහ ප්‍රගතිය මෙහෙයවීමට අප මෙහි සිටිමු."
+    ),
+  },
+
+  // Team-member roles (member names stay English — proper nouns).
+  "7vVQLIHRlybXZaGB5OuxsS": { role: "ආරම්භකයා" },
+  "author-coach-strength": { role: "සම-ආරම්භකයා / කළමනාකරු" },
+  "author-coach-pt": { role: "සම-ආරම්භකයා / කළමනාකරු" },
+  "author-coach-group": { role: "ජ්‍යෙෂ්ඨ පුහුණුකරු / බහුකාර්ය පුහුණුකරු" },
 
   // Careers form
   "careers-form": {

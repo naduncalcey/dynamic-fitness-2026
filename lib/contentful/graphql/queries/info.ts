@@ -28,6 +28,7 @@ export const INFO_BY_ID = /* GraphQL */ `
       headline
       headlineFaded
       ${richTextJson("description")}
+      stats
       ${richTextField("body")}
       imageTooltips
       cta {

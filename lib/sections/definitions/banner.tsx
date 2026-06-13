@@ -15,6 +15,7 @@ type BannerResponse = {
     description?: RichTextField | null;
     cta?: CtaEntry | null;
     backgroundImage?: ImageEntry | null;
+    mapEmbedUrl?: string | null;
     teamMembersCollection?: { items: (AuthorEntry | null)[] } | null;
   } | null;
 };
@@ -42,6 +43,7 @@ export const bannerSection: SectionDefinition = {
         description: entry.description ?? null,
         cta: entry.cta ?? null,
         backgroundImage: entry.backgroundImage ?? null,
+        mapEmbedUrl: entry.mapEmbedUrl ?? null,
         teamMembers: (entry.teamMembersCollection?.items ?? []).filter(
           (m): m is AuthorEntry => Boolean(m)
         ),

@@ -1,4 +1,5 @@
 import { ResponsiveImage } from "@/components/common/ResponsiveImage";
+import { SkeletonImage } from "@/components/common/SkeletonImage";
 import { RichText } from "@/components/common/RichText";
 import { formatBlogDate } from "@/components/blog/formatBlogDate";
 import { BackToBlogLink } from "./BackToBlogLink";
@@ -45,14 +46,13 @@ export function BlogPostTemplate({ post }: BlogPostTemplateProps) {
 
           <div className="mt-6 flex items-center gap-3 text-sm text-white/50">
             {authorAvatarUrl(author) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <SkeletonImage
+                kind="plain"
+                wrapperClassName="h-9 w-9 shrink-0"
+                skeletonClassName="rounded-full"
                 src={authorAvatarUrl(author)!}
                 alt={author?.name ?? ""}
-                width={36}
-                height={36}
                 className="h-9 w-9 rounded-full object-cover"
-                loading="lazy"
               />
             ) : null}
             <div className="flex flex-wrap items-center gap-x-2">

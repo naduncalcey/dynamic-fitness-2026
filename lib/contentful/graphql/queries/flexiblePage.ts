@@ -10,6 +10,7 @@ export const FLEXIBLE_PAGE_BY_SLUG = /* GraphQL */ `
         }
         slug
         pageTitle
+        showBackToTop
         seo {
           ...SeoFields
         }

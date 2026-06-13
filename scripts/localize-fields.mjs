@@ -54,6 +54,9 @@ const LOCALIZE = {
   accordion: ["sectionLabel", "headline", "description"],
   accordionItem: ["question", "answer"],
   banner: ["headline", "highlightWord", "description"],
+  // author.role is localized for the "Banner / Team" cards (member NAMES stay
+  // non-localized — proper nouns); also localizes blog author bylines.
+  author: ["role"],
   review: ["quote", "timeAgo"],
   careersForm: ["heading", "description", "successMessage", "positions"],
   blogListing: ["heading", "description"],

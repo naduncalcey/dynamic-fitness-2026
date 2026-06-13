@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import Script from "next/script";
-import { usePathname } from "next/navigation";
 import { RichText } from "@/components/common/RichText";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
-import { getLocaleFromPathname } from "@/lib/i18n/locale";
+import { Briefcase, MapPin, Tag, ChevronDown } from "lucide-react";
 import type { JobEntry, JobListingsSection } from "@/lib/sections/types";
 import { JobApplyForm } from "../JobApplyForm";
 
@@ -18,32 +17,6 @@ import { JobApplyForm } from "../JobApplyForm";
  */
 
 const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
-
-function BriefcaseIcon() {
-  return (
-    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-    </svg>
-  );
-}
-
-function TagIcon() {
-  return (
-    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
-    </svg>
-  );
-}
 
 function Badge({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -71,31 +44,12 @@ function Bullets({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-/**
- * Format a posted date deterministically. Both the locale and the time zone are
- * pinned explicitly so the server and client render byte-identical strings (the
- * runtime defaults differ — Node resolves en-US/UTC, the browser uses the user's
- * locale/zone — which otherwise causes a hydration mismatch). `postedDate` is a
- * Contentful date-only value parsed as UTC midnight, so we format in UTC to keep
- * the calendar day intact regardless of the viewer's zone.
- */
-function formatPosted(date: string | null, locale: string): string | null {
-  if (!date) return null;
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString(locale, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
-function JobCard({ job, locale }: { job: JobEntry; locale: string }) {
+function JobCard({ job }: { job: JobEntry }) {
   const t = useLabels();
   const [showDetails, setShowDetails] = useState(false);
   const [applying, setApplying] = useState(false);
-  const posted = formatPosted(job.postedDate, locale);
+  // Pre-formatted server-side (see jobListings definition) to stay hydration-safe.
+  const posted = job.postedDisplay;
   const hasDetails =
     Boolean(job.description?.json) || job.responsibilities.length > 0 || job.requirements.length > 0;
 
@@ -108,9 +62,15 @@ function JobCard({ job, locale }: { job: JobEntry; locale: string }) {
         <div className="flex-1">
           <h3 className="text-lg font-medium tracking-tight text-white md:text-xl">{job.title}</h3>
           <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-            {job.employmentType ? <Badge icon={<BriefcaseIcon />}>{job.employmentType}</Badge> : null}
-            {job.location ? <Badge icon={<PinIcon />}>{job.location}</Badge> : null}
-            {job.department ? <Badge icon={<TagIcon />}>{job.department}</Badge> : null}
+            {job.employmentType ? (
+              <Badge icon={<Briefcase className="h-3.5 w-3.5" strokeWidth={1.5} />}>{job.employmentType}</Badge>
+            ) : null}
+            {job.location ? (
+              <Badge icon={<MapPin className="h-3.5 w-3.5" strokeWidth={1.5} />}>{job.location}</Badge>
+            ) : null}
+            {job.department ? (
+              <Badge icon={<Tag className="h-3.5 w-3.5" strokeWidth={1.5} />}>{job.department}</Badge>
+            ) : null}
           </div>
           {job.summary ? <p className="mt-4 max-w-2xl text-sm leading-relaxed text-gray-400">{job.summary}</p> : null}
         </div>
@@ -134,16 +94,11 @@ function JobCard({ job, locale }: { job: JobEntry; locale: string }) {
             className="flex items-center gap-1.5 text-sm text-white/70 transition-colors hover:text-white"
           >
             {showDetails ? t("jobs.hideDetails") : t("jobs.viewDetails")}
-            <svg
+            <ChevronDown
               className={`h-4 w-4 transition-transform ${showDetails ? "rotate-180" : ""}`}
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
               strokeWidth={1.5}
               aria-hidden
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
-            </svg>
+            />
           </button>
 
           {showDetails ? (
@@ -180,9 +135,6 @@ function JobCard({ job, locale }: { job: JobEntry; locale: string }) {
 export function JobListingsDefault({ section }: { section: JobListingsSection }) {
   const { heading, description, emptyMessage, jobs } = section;
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-  // Match useLabels(): derive the active locale from the URL so dates format in
-  // the chosen language and render identically on server and client.
-  const locale = getLocaleFromPathname(usePathname() ?? "/").htmlLang;
 
   return (
     <section id="open-positions" className="w-full scroll-mt-20 border-t border-white/20 bg-black">
@@ -209,7 +161,7 @@ export function JobListingsDefault({ section }: { section: JobListingsSection })
         ) : (
           <div className="mt-10 flex flex-col gap-5">
             {jobs.map((job) => (
-              <JobCard key={job.id} job={job} locale={locale} />
+              <JobCard key={job.id} job={job} />
             ))}
           </div>
         )}

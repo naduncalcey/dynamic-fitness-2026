@@ -34,6 +34,29 @@ type JobListingsResponse = {
 const toStrings = (arr: Array<string | null> | null | undefined): string[] =>
   (arr ?? []).filter((s): s is string => typeof s === "string");
 
+/**
+ * Pre-format the posted date here (server-side) rather than in the client card.
+ * `toLocaleDateString` is not portable across runtimes — Node's ICU and the
+ * browser's CLDR disagree for some locales (notably si-LK), which causes a
+ * hydration mismatch if formatted on both sides. Formatting once on the server
+ * and shipping the finished string guarantees identical SSR/client output. The
+ * date is Contentful date-only (UTC midnight), so format in UTC to keep the day.
+ */
+const formatPosted = (date: string | null | undefined, locale: string): string | null => {
+  if (!date) return null;
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+    // Source dates are Gregorian; pin the calendar so a locale that defaults to a
+    // non-Gregorian one (Buddhist, Hijri, …) doesn't render a shifted date.
+    calendar: "gregory",
+  });
+};
+
 export const jobListingsSection: SectionDefinition = {
   contentfulTypename: "JobListings",
   type: "jobListings",
@@ -63,6 +86,7 @@ export const jobListingsSection: SectionDefinition = {
           requirements: toStrings(j.requirements),
           compensation: j.compensation ?? null,
           postedDate: j.postedDate ?? null,
+          postedDisplay: formatPosted(j.postedDate, options.locale ?? "en-US"),
         }));
 
       return {

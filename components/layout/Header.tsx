@@ -10,6 +10,7 @@ import {
   type LocaleConfig,
 } from "@/lib/i18n/locale";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
+import { Globe, ChevronDown } from "lucide-react";
 
 /**
  * Global site header, recreated from the previous Dynamic Fitness site: logo on
@@ -29,23 +30,6 @@ const navLinks = [
   { labelKey: "nav.careers", href: "/careers" },
   { labelKey: "nav.contact", href: "/contact" },
 ];
-
-function GlobeIcon() {
-  return (
-    <svg
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.6}
-      aria-hidden
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path strokeLinecap="round" d="M3 12h18" />
-      <path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z" />
-    </svg>
-  );
-}
 
 /**
  * Desktop language switcher: a globe-labelled button revealing the configured
@@ -84,18 +68,13 @@ function LanguageSwitcher({ pathname }: { pathname: string }) {
         aria-label={`${t("header.changeLanguage")} — ${current.displayName}`}
         className="flex cursor-pointer items-center gap-2 text-base font-medium text-white transition-colors duration-300 hover:text-red-500"
       >
-        <GlobeIcon />
+        <Globe className="h-4 w-4" strokeWidth={1.5} aria-hidden />
         <span>{current.displayName}</span>
-        <svg
+        <ChevronDown
           className={`h-3 w-3 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
+          strokeWidth={1.5}
           aria-hidden
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-        </svg>
+        />
       </button>
 
       {open ? (

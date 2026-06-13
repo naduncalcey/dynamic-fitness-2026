@@ -102,6 +102,8 @@ const FLEXIBLE_PAGE_TYPE = {
       validations: [{ unique: true }],
     },
     { id: "pageTitle", name: "Page Title", type: "Symbol", required: true },
+    // Toggles the floating scroll-progress "back to top" button on this page.
+    { id: "showBackToTop", name: "Show Back to Top Button", type: "Boolean" },
     {
       id: "seo",
       name: "SEO",
@@ -298,6 +300,8 @@ const INFO_TYPE = {
     { id: "headline", name: "Headline", type: "Symbol" },
     { id: "headlineFaded", name: "Headline (Faded)", type: "Symbol" },
     { id: "description", name: "Description", type: "RichText" },
+    // Metrics band under the about text — JSON array of { label, value }.
+    { id: "stats", name: "Stats (Image Explainer)", type: "Object" },
     {
       id: "imageTooltips",
       name: "Image Tooltips",
@@ -504,7 +508,7 @@ const ACCORDION_TYPE = {
 const BANNER_TYPE = {
   name: "Banner",
   description:
-    "Banner section. Variants: 'Banner - CTA' (background image + overlay, headline, description, CTA) and 'Banner / Team' (a grid of team-member cards backed by Author entries).",
+    "Banner section. Variants: 'Banner - CTA' (background image + overlay, headline, description, CTA), 'Banner / Team' (a grid of team-member cards backed by Author entries), and 'Banner / Map' (an embedded Google Map via mapEmbedUrl).",
   displayField: "internalName",
   fields: [
     { id: "internalName", name: "Internal Name", type: "Symbol", required: true },
@@ -512,11 +516,13 @@ const BANNER_TYPE = {
       id: "frontEndComponent",
       name: "Frontend Component",
       type: "Symbol",
-      validations: [{ in: ["Banner - CTA", "Banner / Team"] }],
+      validations: [{ in: ["Banner - CTA", "Banner / Team", "Banner / Map"] }],
     },
     { id: "headline", name: "Headline", type: "Symbol" },
     { id: "highlightWord", name: "Highlight Word", type: "Symbol" },
     { id: "description", name: "Description", type: "RichText" },
+    // "Banner / Map" only — a Google Maps embed URL (…&output=embed).
+    { id: "mapEmbedUrl", name: "Map Embed URL", type: "Symbol" },
     {
       id: "cta",
       name: "CTA",
@@ -1038,6 +1044,11 @@ await upsertEntry("info", "info-about", {
       )
     )
   ),
+  stats: L([
+    { label: "Founded", value: "2023" },
+    { label: "Opened", value: "2024" },
+    { label: "Certified", value: "SLFBB" },
+  ]),
   imageTooltips: L(["Our Facility", "Strength Zone", "Strength Zone", "Cardio Area"]),
   cta: L(entryLink("cta-set-route")),
   mainImage: L(entryLink("img-about-main")),
@@ -1289,6 +1300,19 @@ await upsertEntry("banner", "banner-cta", {
   backgroundImage: L(entryLink("img-cta-bg")),
 });
 
+// Location map shown under the FAQ on the home page. mapEmbedUrl is a no-API-key
+// Google Maps embed (…&output=embed); swap for an official "Embed a map" src to
+// taste. No headline → renders as a bare framed map.
+await upsertEntry("banner", "banner-map", {
+  internalName: L("Home — Location Map"),
+  frontEndComponent: L("Banner / Map"),
+  mapEmbedUrl: L(
+    "https://www.google.com/maps?q=" +
+      encodeURIComponent("Dynamic Fitness (Pvt) Ltd, Nawinna, Maharagama") +
+      "&z=16&output=embed"
+  ),
+});
+
 // --- "Your First 30 Days" steps (Accordion - Steps), shown under Pricing ---
 // Step media — upload the supplied files, then create Image / Video entries.
 const DOWNLOADS = "/Users/e25test/Downloads";
@@ -1456,6 +1480,7 @@ await upsertEntry("flexiblePage", "blog", {
 await upsertEntry("flexiblePage", "home", {
   slug: L("/"),
   pageTitle: L("Home"),
+  showBackToTop: L(true),
   seo: L(entryLink("seo-home")),
   sections: L([
     entryLink("hero-home"),
@@ -1464,6 +1489,7 @@ await upsertEntry("flexiblePage", "home", {
     entryLink("accordion-steps"),
     entryLink("testimonial-home"),
     entryLink("accordion-faq"),
+    entryLink("banner-map"),
     entryLink("banner-cta"),
   ]),
 });

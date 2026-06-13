@@ -4,6 +4,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsent } from "@/components/common/CookieConsent";
+import { BackgroundMusic } from "@/components/common/BackgroundMusic";
 import { JsonLd } from "@/components/common/JsonLd";
 import { organizationJsonLd, webSiteJsonLd, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { LabelsProvider } from "@/lib/i18n/LabelsProvider";
@@ -72,6 +73,7 @@ export default async function RootLayout({
           {children}
           <Footer />
           <CookieConsent />
+          <BackgroundMusic />
         </LabelsProvider>
       </body>
     </html>

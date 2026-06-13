@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type ReactNode, type MouseEvent } from "react";
+import { Triangle } from "lucide-react";
 
 /**
  * Cursor-following tooltip that wraps an image (ported from the old About
@@ -42,9 +43,7 @@ export function CursorTooltip({ label, children }: CursorTooltipProps) {
           opacity: visible ? 1 : 0,
         }}
       >
-        <svg className="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2L2 22h20L12 2z" />
-        </svg>
+        <Triangle className="h-3 w-3 text-red-500" fill="currentColor" strokeWidth={1.5} aria-hidden />
         {label}
       </div>
     </div>

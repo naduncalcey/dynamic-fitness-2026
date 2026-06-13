@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Cta } from "@/components/common/Cta";
 import { RichText } from "@/components/common/RichText";
+import { Plus } from "lucide-react";
 import type { AccordionSection } from "@/lib/sections/types";
 
 /**
@@ -80,16 +81,7 @@ export function AccordionFaq({ section }: AccordionFaqProps) {
                         open ? "rotate-45" : ""
                       }`}
                     >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={1.5}
-                        viewBox="0 0 24 24"
-                        aria-hidden
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                      </svg>
+                      <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
                     </span>
                   </button>
                   <div
