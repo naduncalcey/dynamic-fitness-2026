@@ -26,6 +26,7 @@ type InfoResponse = {
     mainImage?: ImageEntry | null;
     galleryImagesCollection?: { items?: Array<ImageEntry | null> | null } | null;
     coupleDiscountLabel?: string | null;
+    admissionFeeNote?: string | null;
     individualPlansCollection?: { items?: Array<PricingPlanEntry | null> | null } | null;
     couplePlansCollection?: { items?: Array<PricingPlanEntry | null> | null } | null;
   } | null;
@@ -78,6 +79,7 @@ export const infoSection: SectionDefinition = {
           (i): i is ImageEntry => i !== null
         ),
         coupleDiscountLabel: entry.coupleDiscountLabel ?? null,
+        admissionFeeNote: entry.admissionFeeNote ?? null,
         individualPlans: cleanPlans(entry.individualPlansCollection?.items),
         couplePlans: cleanPlans(entry.couplePlansCollection?.items),
       } satisfies InfoSection;

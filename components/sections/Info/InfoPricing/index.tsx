@@ -6,7 +6,7 @@ import { PRICING_VIEW_COOKIE, getCookie, setCookie } from "@/lib/cookies";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
 import type { CtaEntry, PricingPlanEntry } from "@/lib/contentful/common/types";
 import type { InfoSection } from "@/lib/sections/types";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Info } from "lucide-react";
 
 /**
  * Info - Pricing. Recreates the old site's membership section: number/label
@@ -110,6 +110,7 @@ export function InfoPricing({ section }: InfoPricingProps) {
     headline,
     headlineFaded,
     coupleDiscountLabel,
+    admissionFeeNote,
     individualPlans,
     couplePlans,
   } = section;
@@ -205,6 +206,15 @@ export function InfoPricing({ section }: InfoPricingProps) {
           ))}
         </div>
       </div>
+
+      {admissionFeeNote ? (
+        <div className={`${CONTAINER} !px-0 lg:border-x lg:border-white/20`}>
+          <p className="flex items-center justify-center gap-2.5 border-b border-white/10 px-6 py-5 text-center font-mono text-xs uppercase tracking-wide text-white/50 lg:px-10">
+            <Info className="h-4 w-4 shrink-0 text-red-500" strokeWidth={1.5} />
+            <span>{admissionFeeNote}</span>
+          </p>
+        </div>
+      ) : null}
     </section>
   );
 }

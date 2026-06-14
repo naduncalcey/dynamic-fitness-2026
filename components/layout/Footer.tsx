@@ -50,7 +50,7 @@ const linkGroups = [
 ];
 
 // Public contact details (mirrors the structured data in lib/seo.ts).
-const CONTACT_EMAIL = "admin@dynamicfitness.lk";
+const CONTACT_EMAIL = "nadun.n@dynamicfitness.lk";
 const CONTACT_PHONE_DISPLAY = "+94 77 240 3117";
 const CONTACT_PHONE_HREF = "tel:+94772403117";
 const INSTAGRAM_URL = "https://www.instagram.com/dynamicfitness.lk";

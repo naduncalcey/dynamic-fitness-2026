@@ -43,6 +43,7 @@ export const INFO_BY_ID = /* GraphQL */ `
         }
       }
       coupleDiscountLabel
+      admissionFeeNote
       individualPlansCollection(limit: 6) {
         items {
           ...PricingPlanFields

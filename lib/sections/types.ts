@@ -84,6 +84,8 @@ export type InfoSection = BaseSection & {
   galleryImages: ImageEntry[];
   // Pricing
   coupleDiscountLabel: string | null;
+  /** Short disclaimer rendered under the pricing cards (e.g. admission fee). */
+  admissionFeeNote: string | null;
   individualPlans: PricingPlanEntry[];
   couplePlans: PricingPlanEntry[];
 };
