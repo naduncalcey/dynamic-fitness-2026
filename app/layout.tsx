@@ -61,6 +61,11 @@ export default async function RootLayout({
   return (
     <html
       lang={DEFAULT_LOCALE.htmlLang}
+      // Tells Next's App Router to temporarily disable the global
+      // `scroll-behavior: smooth` (app/globals.css) during route changes, so
+      // navigations reset to the top instead of inheriting the prior scroll
+      // position — while in-page anchor links stay smooth.
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full">
