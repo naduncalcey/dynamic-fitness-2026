@@ -177,14 +177,14 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
   // an Info article). When a page has none of these, it would ship with no
   // top-level heading (e.g. careers = Banner + Banner + JobListings), so add a
   // visually-hidden <h1> from the page title for a correct document outline.
-  const H1_BEARING_SECTIONS = new Set([
-    "hero",
-    "contactForm",
-    "careersForm",
-    "blogListing",
-    "info",
-  ]);
-  const hasOwnH1 = page.sections.some((s) => H1_BEARING_SECTIONS.has(s.type));
+  const H1_SECTION_TYPES = new Set(["hero", "contactForm", "careersForm", "blogListing"]);
+  // Info renders an <h1> only for the headline-led variants; Pricing and
+  // Amenities render <h2>, so those don't count as the page's top heading.
+  const hasOwnH1 = page.sections.some((s) =>
+    s.type === "info"
+      ? s.frontEndComponent === "Info - Image Explainer" || s.frontEndComponent === "Info - Default"
+      : H1_SECTION_TYPES.has(s.type)
+  );
 
   return (
     <main id="main-content" tabIndex={-1} lang={locale.htmlLang}>

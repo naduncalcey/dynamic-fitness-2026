@@ -2,6 +2,7 @@ import type { InfoSection } from "@/lib/sections/types";
 import { InfoImageExplainer } from "./InfoImageExplainer";
 import { InfoPricing } from "./InfoPricing";
 import { InfoDefault } from "./InfoDefault";
+import { InfoAmenities } from "./InfoAmenities";
 
 /**
  * Info section. Routes to a variant by `frontEndComponent` via switch-case
@@ -21,6 +22,8 @@ export function Info({ section }: InfoProps) {
       return <InfoPricing section={section} />;
     case "Info - Default":
       return <InfoDefault section={section} />;
+    case "Info - Amenities":
+      return <InfoAmenities section={section} />;
     default:
       return <InfoImageExplainer section={section} />;
   }

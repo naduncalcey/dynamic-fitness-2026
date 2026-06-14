@@ -66,7 +66,8 @@ export type InfoStat = { label: string; value: string };
 export type InfoFrontEndComponent =
   | "Info - Image Explainer"
   | "Info - Pricing"
-  | "Info - Default";
+  | "Info - Default"
+  | "Info - Amenities";
 
 export type InfoSection = BaseSection & {
   type: "info";
