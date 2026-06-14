@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, type MouseEvent } from "react";
+import { useRef, useState, type MouseEvent } from "react";
 import { usePathname } from "next/navigation";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
 import { getLocaleFromPathname, localizeHref } from "@/lib/i18n/locale";
 import { SkeletonImage } from "@/components/common/SkeletonImage";
+import { ScheduleModal } from "@/components/layout/ScheduleModal";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
 /**
@@ -20,12 +21,23 @@ const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
 // gym's services don't have dedicated pages yet, so they anchor to the most
 // relevant home section (#pricing lists what each plan includes, #about
 // describes the gym), FAQs jump to the FAQ accordion, and Contact opens email.
-const linkGroups = [
+// "Time Schedule" is the exception — instead of navigating, it opens the
+// opening-hours popup (ScheduleModal), kept entirely in the frontend.
+type FooterLink =
+  | { labelKey: string; href: string } // label from the Contentful uiLabel set
+  | { label: string; href: string } // label hardcoded in the frontend
+  | { label: string; action: "schedule" }; // opens the opening-hours popup
+
+type FooterLinkGroup = { titleKey: string; links: FooterLink[] };
+
+const linkGroups: FooterLinkGroup[] = [
   {
     titleKey: "footer.group.services",
     links: [
       { labelKey: "footer.link.personalTraining", href: "/#pricing" },
-      { labelKey: "footer.link.hiitClasses", href: "/#pricing" },
+      // Amenities page — a Contentful FlexiblePage at /services/amenities. Label
+      // kept in the frontend (the footer.link.hiitClasses uiLabel is now unused).
+      { label: "Amenities", href: "/services/amenities" },
       { labelKey: "footer.link.pricing", href: "/#pricing" },
     ],
   },
@@ -34,7 +46,8 @@ const linkGroups = [
     links: [
       // FitConnect partner app — same URL as the logo carousel (Hero/LogoScroll).
       { labelKey: "footer.link.fitconnect", href: "https://fitconnect.me" },
-      { labelKey: "footer.link.classSchedule", href: "/#pricing" },
+      // Opening-hours popup; label and hours live in the frontend, not Contentful.
+      { label: "Time Schedule", action: "schedule" },
       { labelKey: "footer.link.faqs", href: "/#faq" },
     ],
   },
@@ -86,6 +99,7 @@ export function Footer() {
   const t = useLabels();
   const current = getLocaleFromPathname(usePathname() ?? "/");
   const ctaRef = useRef<HTMLAnchorElement>(null);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
 
   const handleMouseMove = (e: MouseEvent<HTMLAnchorElement>) => {
     const el = ctaRef.current;
@@ -170,15 +184,29 @@ export function Footer() {
               </p>
               <ul className="flex flex-col gap-3">
                 {group.links.map((link) => {
+                  if ("action" in link) {
+                    return (
+                      <li key={link.action}>
+                        <button
+                          type="button"
+                          onClick={() => setScheduleOpen(true)}
+                          className="cursor-pointer text-left text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+                        >
+                          {link.label}
+                        </button>
+                      </li>
+                    );
+                  }
                   const isExternal = /^https?:/i.test(link.href);
+                  const label = "labelKey" in link ? t(link.labelKey) : link.label;
                   return (
-                    <li key={link.labelKey}>
+                    <li key={"labelKey" in link ? link.labelKey : link.href}>
                       <a
                         href={localizeHref(link.href, current)}
                         {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
                         className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                       >
-                        {t(link.labelKey)}
+                        {label}
                       </a>
                     </li>
                   );
@@ -251,6 +279,8 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      <ScheduleModal open={scheduleOpen} onClose={() => setScheduleOpen(false)} />
     </footer>
   );
 }
