@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { BlogPostEntry } from "@/lib/contentful/blog/types";
 import type { JobEntry } from "@/lib/sections/types";
+import { LOCALE_MAP, DEFAULT_LOCALE, localizeHref, type LocaleConfig } from "@/lib/i18n/locale";
 
 /**
  * Site-level SEO constants + helpers shared across routes. The base URL drives
@@ -50,23 +51,49 @@ export function absoluteUrl(path?: string | null): string {
   return `${SITE_URL}/${path.replace(/^\/+/, "")}`;
 }
 
+/** Open Graph locale tag for a site locale (e.g. en → en_LK, si → si_LK). */
+export function ogLocale(locale: LocaleConfig): string {
+  return `${locale.htmlLang.split("-")[0]}_LK`;
+}
+
+/** OG alternateLocale tags = every configured locale except the active one. */
+export function ogAlternateLocales(active: LocaleConfig): string[] {
+  return LOCALE_MAP.filter((l) => l.urlSlug !== active.urlSlug).map(ogLocale);
+}
+
+/**
+ * hreflang alternates for a locale-agnostic path (e.g. "/careers"): each locale's
+ * BCP-47 tag → its absolute URL, plus `x-default` → the default-locale URL. Lets
+ * search engines serve the right language version instead of treating the
+ * `/si/...` pages as duplicates of the English ones.
+ */
+export function localeAlternates(path: string): Record<string, string> {
+  const languages: Record<string, string> = {};
+  for (const l of LOCALE_MAP) languages[l.htmlLang] = absoluteUrl(localizeHref(path, l));
+  languages["x-default"] = absoluteUrl(localizeHref(path, DEFAULT_LOCALE));
+  return languages;
+}
+
 /**
  * Build full Open Graph + Twitter + canonical metadata for a blog post. Prefers
  * the linked SEO entry's fields, falling back to the post's own title, excerpt,
  * cover image, author, and date so every post gets sensible SEO even without a
  * hand-authored SEO entry.
  */
-export function blogPostMetadata(post: BlogPostEntry): Metadata {
+export function blogPostMetadata(post: BlogPostEntry, locale: LocaleConfig): Metadata {
   const seo = post.seo;
   const slug = (post.slug ?? "").replace(/^\/+/, "");
-  const url = absoluteUrl(`/blog/${slug}`);
+  const path = `/blog/${slug}`;
+  const url = absoluteUrl(localizeHref(path, locale));
 
   // Full title string for OG/Twitter (no template applies there). The <title>
   // uses `absolute` when hand-authored so the root template doesn't double the
   // brand suffix; otherwise a plain string lets the template add "| Dynamic…".
-  const ogTitle = seo?.seoTitle ?? `${post.title} | ${SITE_NAME}`;
   const description =
     seo?.seoDescription ?? post.excerpt ?? undefined;
+  // Social title/description: editor OG overrides, else the post's SEO/excerpt.
+  const ogTitle = seo?.seoOgTitle ?? seo?.seoTitle ?? `${post.title} | ${SITE_NAME}`;
+  const ogDescription = seo?.seoOgDescription ?? description;
   const canonical = seo?.seoCanonicalUrl ?? url;
   const ogImage = seo?.seoOgImage?.url ?? post.coverImage?.desktop?.url ?? null;
   const authorName = post.author?.name ?? undefined;
@@ -77,14 +104,16 @@ export function blogPostMetadata(post: BlogPostEntry): Metadata {
   return {
     title: seo?.seoTitle ? { absolute: seo.seoTitle } : post.title,
     description,
-    alternates: { canonical },
+    alternates: { canonical, languages: localeAlternates(path) },
     authors: authorName ? [{ name: authorName }] : undefined,
     openGraph: {
       type: "article",
       url,
       title: ogTitle,
-      description,
+      description: ogDescription,
       siteName: SITE_NAME,
+      locale: ogLocale(locale),
+      alternateLocale: ogAlternateLocales(locale),
       publishedTime: post.publishedDate ?? undefined,
       authors: authorName ? [authorName] : undefined,
       images: ogImage
@@ -102,7 +131,7 @@ export function blogPostMetadata(post: BlogPostEntry): Metadata {
     twitter: {
       card: ogImage ? "summary_large_image" : "summary",
       title: ogTitle,
-      description,
+      description: ogDescription,
       images: ogImage ? [absoluteUrl(ogImage)] : undefined,
     },
     robots:

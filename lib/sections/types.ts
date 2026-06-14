@@ -19,6 +19,9 @@ export type SeoEntry = {
   sys: { id: string };
   seoTitle?: string | null;
   seoDescription?: string | null;
+  /** Optional social-share overrides; fall back to seoTitle/seoDescription. */
+  seoOgTitle?: string | null;
+  seoOgDescription?: string | null;
   seoOgImage?: ImageAsset | null;
   seoNoIndex?: boolean | null;
   seoNoFollow?: boolean | null;

@@ -5,6 +5,8 @@ export const SEO_FRAGMENT = /* GraphQL */ `
     }
     seoTitle
     seoDescription
+    seoOgTitle
+    seoOgDescription
     seoOgImage {
       url
       width

@@ -4,8 +4,8 @@ import { getFlexiblePageBySlug } from "@/lib/contentful/pages";
 import { getBlogPostBySlug } from "@/lib/contentful/blog";
 import { SectionsRenderer } from "@/lib/sections/SectionsRenderer";
 import { BlogPostTemplate } from "@/components/templates/BlogPost";
-import { splitLocaleFromSlug, LOCALE_MAP, DEFAULT_LOCALE } from "@/lib/i18n/locale";
-import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd, jobPostingsJsonLd } from "@/lib/seo";
+import { splitLocaleFromSlug, LOCALE_MAP, DEFAULT_LOCALE, localizeHref, type LocaleConfig } from "@/lib/i18n/locale";
+import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd, jobPostingsJsonLd, SITE_NAME, ogLocale, ogAlternateLocales, localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/common/JsonLd";
 import { BackToTop } from "@/components/common/BackToTop";
 import { getFlexiblePageEntries, getBlogPostEntries } from "@/lib/contentful/sitemap";
@@ -77,6 +77,7 @@ const blogPostSlug = (rest: string[]) =>
 const seoToMetadata = (
   seo: SeoEntry | null | undefined,
   path: string,
+  locale: LocaleConfig,
   fallbackTitle?: string | null,
   fallbackDescription?: string | null
 ): Metadata => {
@@ -86,22 +87,29 @@ const seoToMetadata = (
   const title = seo?.seoTitle
     ? { absolute: seo.seoTitle }
     : fallbackTitle ?? undefined;
-  const ogTitle = seo?.seoTitle ?? fallbackTitle ?? undefined;
   const description = seo?.seoDescription ?? fallbackDescription ?? undefined;
+  // Social (OG/Twitter) title + description: editor-set overrides, else reuse
+  // the page's SEO title/description.
+  const ogTitle = seo?.seoOgTitle ?? seo?.seoTitle ?? fallbackTitle ?? undefined;
+  const ogDescription = seo?.seoOgDescription ?? description;
   const ogImage = seo?.seoOgImage?.url ?? null;
   // Canonical defaults to this page's own absolute URL so every page emits one
   // (helps Google pick the right URL + title), unless an explicit override is set.
-  const canonical = seo?.seoCanonicalUrl ?? absoluteUrl(path);
+  const selfUrl = absoluteUrl(localizeHref(path, locale));
+  const canonical = seo?.seoCanonicalUrl ?? selfUrl;
 
   return {
     title,
     description,
-    alternates: { canonical },
+    alternates: { canonical, languages: localeAlternates(path) },
     openGraph: {
       type: "website",
       title: ogTitle,
-      description,
-      url: canonical,
+      description: ogDescription,
+      url: selfUrl,
+      siteName: SITE_NAME,
+      locale: ogLocale(locale),
+      alternateLocale: ogAlternateLocales(locale),
       images: ogImage
         ? [
             {
@@ -113,8 +121,8 @@ const seoToMetadata = (
         : undefined,
     },
     twitter: ogImage
-      ? { card: "summary_large_image", title: ogTitle, description, images: [ogImage] }
-      : { card: "summary", title: ogTitle, description },
+      ? { card: "summary_large_image", title: ogTitle, description: ogDescription, images: [ogImage] }
+      : { card: "summary", title: ogTitle, description: ogDescription },
     robots:
       seo?.seoNoIndex || seo?.seoNoFollow
         ? { index: !seo.seoNoIndex, follow: !seo.seoNoFollow }
@@ -129,14 +137,14 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
   const postSlug = blogPostSlug(rest);
   if (postSlug) {
     const post = await getBlogPostBySlug(postSlug, { locale: locale.contentfulCode });
-    return post ? blogPostMetadata(post) : {};
+    return post ? blogPostMetadata(post, locale) : {};
   }
 
   const path = slugPathFrom(rest);
   const page = await getFlexiblePageBySlug(path, {
     locale: locale.contentfulCode,
   });
-  return page ? seoToMetadata(page.seo, path, page.pageTitle) : {};
+  return page ? seoToMetadata(page.seo, path, locale, page.pageTitle) : {};
 };
 
 export default async function FlexiblePageRoute({ params }: PageProps) {
@@ -189,6 +197,12 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
       {jobPostings.map((posting, i) => (
         <JsonLd key={`job-${i}`} data={posting} />
       ))}
+      {/* Editor-authored custom JSON-LD from the page's SEO entry
+          (Contentful `seoSchemaMarkup`), rendered alongside the code-generated
+          schema so content editors can add structured data to any page. */}
+      {page.seo?.seoSchemaMarkup ? (
+        <JsonLd data={page.seo.seoSchemaMarkup as Record<string, unknown>} />
+      ) : null}
       <SectionsRenderer sections={page.sections} />
       {page.showBackToTop ? <BackToTop /> : null}
     </main>
