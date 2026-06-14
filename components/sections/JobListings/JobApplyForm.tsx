@@ -26,8 +26,8 @@ declare global {
 type Status = "idle" | "submitting" | "success" | "error";
 
 const fieldClass =
-  "w-full rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors focus:border-white/40";
-const labelClass = "mb-2 block text-[11px] font-medium uppercase tracking-[0.15em] text-white/50";
+  "w-full rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/50 outline-none transition-colors focus:border-white/40";
+const labelClass = "mb-2 block text-[11px] font-medium uppercase tracking-[0.15em] text-white/70";
 
 export function JobApplyForm({ jobTitle }: { jobTitle: string }) {
   const t = useLabels();
@@ -93,7 +93,7 @@ export function JobApplyForm({ jobTitle }: { jobTitle: string }) {
 
   if (status === "success") {
     return (
-      <div className="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-6 text-center">
+      <div role="status" className="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-6 text-center">
         <p className="text-white">{t("careers.success")}</p>
       </div>
     );
@@ -156,7 +156,7 @@ export function JobApplyForm({ jobTitle }: { jobTitle: string }) {
       {/* Turnstile renders into this element (see effect above). */}
       {turnstileSiteKey ? <div ref={widgetEl} /> : null}
 
-      {status === "error" && error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {status === "error" && error ? <p role="alert" className="text-sm text-red-400">{error}</p> : null}
 
       <button
         type="submit"

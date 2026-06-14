@@ -101,8 +101,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-skeleton {
-    animation: none;
+  .ds-skeleton,
+  .animate-marquee,
+  .animate-fade-up {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }
 
@@ -114,4 +119,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+/*
+ * Visible keyboard-focus indicator for all interactive elements. Declared
+ * outside any cascade layer so it overrides Tailwind's `outline-none` utility.
+ * `:focus-visible` only matches keyboard (and other non-pointer) focus, so
+ * mouse/touch clicks on buttons/links are visually unaffected.
+ */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/*
+ * The skip-link target receives focus programmatically; the scroll jump is the
+ * cue, so don't draw a ring around the entire main region.
+ */
+#main-content:focus,
+#main-content:focus-visible {
+  outline: none;
 }

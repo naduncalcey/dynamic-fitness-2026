@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useCallback, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { RichText } from "@/components/common/RichText";
 import { BlogPostCard } from "@/components/blog/BlogPostCard";
 import { UnicornBackground } from "@/components/sections/Hero/UnicornBackground";
@@ -15,11 +15,11 @@ import type { BlogListingSection } from "@/lib/sections/types";
  * (fetched during hydration, newest first) filtered client-side by the query.
  * Used on the /blog page.
  *
- * The page is statically prerendered (ISR), so the `useSearchParams()` read that
- * seeds the query from `?q=` is isolated in `BlogListingInteractive` and wrapped
- * in `<Suspense>`. The Suspense fallback renders the *unfiltered* view, so the
- * full post grid still lands in the static HTML (good for SEO/LCP); the client
- * then hydrates the interactive, URL-synced version.
+ * The page is statically prerendered (ISR). To keep the full post grid in the
+ * static HTML (good for SEO/LCP) without rendering the section twice, the query
+ * is seeded from `?q=` on the client after mount (via `window.location`) rather
+ * than with `useSearchParams()` — the latter would force a `<Suspense>` boundary
+ * whose fallback duplicated the whole section in the streamed HTML.
  */
 
 type BlogListingProps = {
@@ -123,7 +123,7 @@ function BlogListingView({
             ))}
           </div>
         ) : (
-          <p className="text-center text-sm text-white/40">
+          <p className="text-center text-sm text-white/70">
             {posts.length === 0
               ? t("blog.noPosts")
               : t("blog.noMatch", { q: query.trim() })}
@@ -138,32 +138,36 @@ function BlogListingView({
 function BlogListingInteractive({ section }: BlogListingProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
+  const [query, setQuery] = useState("");
+
+  // Seed the query from `?q=` after mount. Reading window.location here (instead
+  // of useSearchParams) avoids the Suspense boundary that duplicated the section
+  // in the static HTML. SSR/first paint shows all posts; a `?q=` deep link
+  // applies its filter once hydrated.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) setQuery(q);
+  }, []);
 
   // Mirror the query into the URL (?q=) so results are shareable/bookmarkable,
   // without scrolling or pushing a new history entry per keystroke.
   const onQueryChange = useCallback(
     (next: string) => {
       setQuery(next);
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(window.location.search);
       if (next.trim()) params.set("q", next);
       else params.delete("q");
       const qs = params.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     },
-    [pathname, router, searchParams]
+    [pathname, router]
   );
 
   return <BlogListingView section={section} query={query} onQueryChange={onQueryChange} />;
 }
 
 export function BlogListing({ section }: BlogListingProps) {
-  return (
-    <Suspense fallback={<BlogListingView section={section} query="" onQueryChange={() => {}} />}>
-      <BlogListingInteractive section={section} />
-    </Suspense>
-  );
+  return <BlogListingInteractive section={section} />;
 }
 
 export default BlogListing;

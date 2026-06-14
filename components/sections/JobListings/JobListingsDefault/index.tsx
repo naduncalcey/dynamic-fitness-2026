@@ -124,7 +124,7 @@ function JobCard({ job }: { job: JobEntry }) {
       {applying && job.title ? <JobApplyForm jobTitle={job.title} /> : null}
 
       {posted ? (
-        <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.1em] text-white/30">
+        <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.1em] text-white/70">
           {t("jobs.posted", { date: posted })}
         </p>
       ) : null}

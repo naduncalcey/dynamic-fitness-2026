@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
 
 /**
  * Opening-hours popup for the footer "Time Schedule" link. Frontend-only by
@@ -13,17 +14,17 @@ import { X } from "lucide-react";
 
 type ScheduleRow = { day: string; hours: string };
 
-const SCHEDULE: ScheduleRow[] = [
-  { day: "Monday – Saturday", hours: "5:30 AM – 11:00 PM" },
-  { day: "Sunday", hours: "6:00 AM – 11:30 AM" },
-];
-
 const TITLE_ID = "schedule-modal-title";
 
 export function ScheduleModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const [show, setShow] = useState(false);
+  const t = useLabels();
+  const schedule: ScheduleRow[] = [
+    { day: t("schedule.weekdays"), hours: t("schedule.weekdaysHours") },
+    { day: t("schedule.sunday"), hours: t("schedule.sundayHours") },
+  ];
 
   // Drive the entrance transition on the frame after mount.
   useEffect(() => {
@@ -94,13 +95,13 @@ export function ScheduleModal({ open, onClose }: { open: boolean; onClose: () =>
       >
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
           <h2 id={TITLE_ID} className="text-lg font-medium tracking-tight">
-            Opening Hours
+            {t("schedule.title")}
           </h2>
           <button
             ref={closeRef}
             type="button"
             onClick={onClose}
-            aria-label="Close opening hours"
+            aria-label={t("schedule.close")}
             className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/40 hover:text-white"
           >
             <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
@@ -109,7 +110,7 @@ export function ScheduleModal({ open, onClose }: { open: boolean; onClose: () =>
 
         <table className="w-full text-sm">
           <tbody className="divide-y divide-white/10">
-            {SCHEDULE.map((row) => (
+            {schedule.map((row) => (
               <tr key={row.day} className="transition-colors hover:bg-white/[0.02]">
                 <th scope="row" className="px-6 py-4 text-left font-normal text-gray-300">
                   {row.day}
@@ -120,8 +121,8 @@ export function ScheduleModal({ open, onClose }: { open: boolean; onClose: () =>
           </tbody>
         </table>
 
-        <p className="border-t border-white/10 px-6 py-4 text-xs text-white/40">
-          Sri Lanka Standard Time (GMT+5:30)
+        <p className="border-t border-white/10 px-6 py-4 text-xs text-white/60">
+          {t("schedule.timezone")}
         </p>
       </div>
     </div>,

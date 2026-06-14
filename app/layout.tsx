@@ -10,6 +10,7 @@ import { organizationJsonLd, webSiteJsonLd, SITE_NAME, SITE_URL } from "@/lib/se
 import { LabelsProvider } from "@/lib/i18n/LabelsProvider";
 import { DEFAULT_LOCALE } from "@/lib/i18n/locale";
 import { HtmlLangSync } from "@/components/common/HtmlLangSync";
+import { SkipLink } from "@/components/common/SkipLink";
 import { getAllUiLabels } from "@/lib/contentful/uiLabels";
 import "./globals.css";
 
@@ -69,6 +70,8 @@ export default async function RootLayout({
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={webSiteJsonLd()} />
         <LabelsProvider labels={labels}>
+          {/* Skip link first; localized, so it renders inside LabelsProvider. */}
+          <SkipLink />
           <Header />
           {children}
           <Footer />

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
 import type { BannerSection } from "@/lib/sections/types";
 
 /**
@@ -36,6 +37,7 @@ function toMapsLink(embedUrl: string): string {
 export function BannerMap({ section }: BannerMapProps) {
   const { headline, highlightWord, mapEmbedUrl } = section;
   const [loaded, setLoaded] = useState(false);
+  const t = useLabels();
 
   if (!mapEmbedUrl) return null;
 
@@ -69,7 +71,7 @@ export function BannerMap({ section }: BannerMapProps) {
               the a11y tree — the overlay anchor below carries the accessible name. */}
           <iframe
             src={mapEmbedUrl}
-            title="Dynamic Fitness location on Google Maps"
+            title={t("map.iframeTitle")}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             tabIndex={-1}
@@ -85,11 +87,11 @@ export function BannerMap({ section }: BannerMapProps) {
             href={mapsLink}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Open Dynamic Fitness location in Google Maps (opens in a new tab)"
+            aria-label={t("map.openAria")}
             className="absolute inset-0 z-10 flex items-end justify-end rounded-2xl p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-red-500"
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/70 px-3 py-1.5 text-xs font-medium text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
-              Open in Google Maps
+              {t("map.openLabel")}
               <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
             </span>
           </a>

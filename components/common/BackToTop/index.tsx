@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
+import { useLabels } from "@/lib/i18n/LabelsProvider";
 
 /**
  * Floating circular "back to top" button with a scroll-progress ring. Fixed
@@ -26,6 +27,7 @@ const SHOW_AFTER = 400; // px scrolled before the button appears
 export function BackToTop() {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
+  const t = useLabels();
 
   useEffect(() => {
     const onScroll = () => {
@@ -46,7 +48,7 @@ export function BackToTop() {
   return (
     <button
       type="button"
-      aria-label="Back to top"
+      aria-label={t("a11y.backToTop")}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={`group fixed bottom-6 right-6 z-30 grid size-14 place-items-center rounded-full border border-white/15 bg-[var(--cta-surface)] text-white/70 backdrop-blur-md transition-all duration-300 hover:border-[var(--cta-red-border)] hover:text-white ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"

@@ -49,7 +49,7 @@ function TeamCard({ member, index }: { member: AuthorEntry; index: number }) {
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center font-mono text-2xl tracking-[0.15em] text-white/30">
+          <div className="flex h-full w-full items-center justify-center font-mono text-2xl tracking-[0.15em] text-white/50">
             {initials(member.name)}
           </div>
         )}

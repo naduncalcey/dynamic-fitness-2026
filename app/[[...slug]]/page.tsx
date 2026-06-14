@@ -149,8 +149,8 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
     const post = await getBlogPostBySlug(postSlug, { locale: locale.contentfulCode });
     if (!post) notFound();
     return (
-      <main lang={locale.htmlLang}>
-        <BlogPostTemplate post={post} />
+      <main id="main-content" tabIndex={-1} lang={locale.htmlLang}>
+        <BlogPostTemplate post={post} locale={locale.urlSlug} />
       </main>
     );
   }
@@ -165,8 +165,22 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
   const faq = faqJsonLd(collectFaqItems(page.sections));
   const jobPostings = jobPostingsJsonLd(collectJobs(page.sections));
 
+  // Sections that render their own <h1> (Hero, the form sections, BlogListing, or
+  // an Info article). When a page has none of these, it would ship with no
+  // top-level heading (e.g. careers = Banner + Banner + JobListings), so add a
+  // visually-hidden <h1> from the page title for a correct document outline.
+  const H1_BEARING_SECTIONS = new Set([
+    "hero",
+    "contactForm",
+    "careersForm",
+    "blogListing",
+    "info",
+  ]);
+  const hasOwnH1 = page.sections.some((s) => H1_BEARING_SECTIONS.has(s.type));
+
   return (
-    <main lang={locale.htmlLang}>
+    <main id="main-content" tabIndex={-1} lang={locale.htmlLang}>
+      {!hasOwnH1 && page.pageTitle ? <h1 className="sr-only">{page.pageTitle}</h1> : null}
       {/* Homepage carries the LocalBusiness (gym) structured data. */}
       {path === "/" ? <JsonLd data={gymJsonLd()} /> : null}
       {/* FAQPage structured data when the page has an FAQ accordion. */}

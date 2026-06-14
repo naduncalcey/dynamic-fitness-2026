@@ -10,7 +10,7 @@ import type { BlogPostCard as BlogPostCardType } from "@/lib/contentful/blog/typ
 export function BlogPostCard({ post }: { post: BlogPostCardType }) {
   const current = getLocaleFromPathname(usePathname() ?? "/");
   const href = localizeHref(`/blog/${(post.slug ?? "").replace(/^\/+/, "")}`, current);
-  const date = formatBlogDate(post.publishedDate);
+  const date = formatBlogDate(post.publishedDate, current.urlSlug);
 
   return (
     <Link
@@ -38,7 +38,7 @@ export function BlogPostCard({ post }: { post: BlogPostCardType }) {
         {post.excerpt ? (
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-400">{post.excerpt}</p>
         ) : null}
-        <div className="mt-4 flex items-center gap-2 pt-2 text-xs text-white/40">
+        <div className="mt-4 flex items-center gap-2 pt-2 text-xs text-white/70">
           {post.author?.name ? <span>{post.author.name}</span> : null}
           {post.author?.name && date ? <span aria-hidden>·</span> : null}
           {date ? <span>{date}</span> : null}

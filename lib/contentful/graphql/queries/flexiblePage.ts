@@ -2,8 +2,8 @@ import { SEO_FRAGMENT } from "../fragments/seo";
 
 export const FLEXIBLE_PAGE_BY_SLUG = /* GraphQL */ `
   ${SEO_FRAGMENT}
-  query FlexiblePageBySlug($slug: String!, $preview: Boolean) {
-    flexiblePageCollection(where: { slug: $slug }, limit: 1, preview: $preview) {
+  query FlexiblePageBySlug($slug: String!, $locale: String, $preview: Boolean) {
+    flexiblePageCollection(where: { slug: $slug }, locale: $locale, limit: 1, preview: $preview) {
       items {
         sys {
           id

@@ -34,12 +34,13 @@ function CheckIcon({ accent }: { accent: boolean }) {
 }
 
 function PlanCard({ plan }: { plan: PricingPlanEntry }) {
+  const t = useLabels();
   const popular = Boolean(plan.isPopular);
   const features = (plan.features ?? []).filter((f): f is string => Boolean(f));
 
   const planCta: CtaEntry = {
     sys: { id: `${plan.sys.id}-cta` },
-    label: plan.ctaLabel ?? "Get Started",
+    label: plan.ctaLabel ?? t("pricing.ctaFallback"),
     variant: popular ? "Red" : "Gray",
     size: "Medium",
     linkBehavior: "External",
@@ -72,7 +73,7 @@ function PlanCard({ plan }: { plan: PricingPlanEntry }) {
             <h3 className="mb-2 text-lg font-medium tracking-tight text-white">{plan.name}</h3>
             {popular ? (
               <span className="border border-red-500/30 bg-red-500/10 px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-red-400">
-                Popular
+                {t("pricing.popularBadge")}
               </span>
             ) : null}
           </div>

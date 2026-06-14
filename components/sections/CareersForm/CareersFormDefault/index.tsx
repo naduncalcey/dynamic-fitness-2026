@@ -21,8 +21,8 @@ type Status = "idle" | "submitting" | "success" | "error";
 
 const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
 const fieldClass =
-  "w-full rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors focus:border-white/40";
-const labelClass = "mb-2 block text-[11px] font-medium uppercase tracking-[0.15em] text-white/50";
+  "w-full rounded-lg border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/50 outline-none transition-colors focus:border-white/40";
+const labelClass = "mb-2 block text-[11px] font-medium uppercase tracking-[0.15em] text-white/70";
 
 export function CareersFormDefault({ section }: CareersFormDefaultProps) {
   const { heading, description, positions, successMessage } = section;
@@ -72,7 +72,7 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
         {/* Form / success */}
         <div>
           {status === "success" ? (
-            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center">
+            <div role="status" className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center">
               <p className="text-lg text-white">
                 {successMessage ?? t("careers.success")}
               </p>
@@ -188,7 +188,7 @@ export function CareersFormDefault({ section }: CareersFormDefaultProps) {
               ) : null}
 
               {status === "error" && error ? (
-                <p className="text-sm text-red-400">{error}</p>
+                <p role="alert" className="text-sm text-red-400">{error}</p>
               ) : null}
 
               <button

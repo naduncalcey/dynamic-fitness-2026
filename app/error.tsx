@@ -73,7 +73,7 @@ export default function Error({
           </Link>
         </div>
         {error.digest ? (
-          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.15em] text-white/30">
+          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.15em] text-white/60">
             Ref: {error.digest}
           </p>
         ) : null}

@@ -69,7 +69,7 @@ export const getFlexiblePageBySlug = async (
     try {
       const data = await contentfulFetch<FlexiblePageBySlugResponse>(
         FLEXIBLE_PAGE_BY_SLUG,
-        { slug: requestedSlug, preview: options.preview ?? false },
+        { slug: requestedSlug, locale: options.locale, preview: options.preview ?? false },
         { preview: options.preview }
       );
       return data.flexiblePageCollection?.items?.[0] ?? null;

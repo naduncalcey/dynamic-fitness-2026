@@ -24,9 +24,8 @@ const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
 // "Time Schedule" is the exception — instead of navigating, it opens the
 // opening-hours popup (ScheduleModal), kept entirely in the frontend.
 type FooterLink =
-  | { labelKey: string; href: string } // label from the Contentful uiLabel set
-  | { label: string; href: string } // label hardcoded in the frontend
-  | { label: string; action: "schedule" }; // opens the opening-hours popup
+  | { labelKey: string; href: string } // navigates to href
+  | { labelKey: string; action: "schedule" }; // opens the opening-hours popup
 
 type FooterLinkGroup = { titleKey: string; links: FooterLink[] };
 
@@ -35,9 +34,8 @@ const linkGroups: FooterLinkGroup[] = [
     titleKey: "footer.group.services",
     links: [
       { labelKey: "footer.link.personalTraining", href: "/#pricing" },
-      // Amenities page — a Contentful FlexiblePage at /services/amenities. Label
-      // kept in the frontend (the footer.link.hiitClasses uiLabel is now unused).
-      { label: "Amenities", href: "/services/amenities" },
+      // Amenities page — a Contentful FlexiblePage at /services/amenities.
+      { labelKey: "footer.link.amenities", href: "/services/amenities" },
       { labelKey: "footer.link.pricing", href: "/#pricing" },
     ],
   },
@@ -46,8 +44,8 @@ const linkGroups: FooterLinkGroup[] = [
     links: [
       // FitConnect partner app — same URL as the logo carousel (Hero/LogoScroll).
       { labelKey: "footer.link.fitconnect", href: "https://fitconnect.me" },
-      // Opening-hours popup; label and hours live in the frontend, not Contentful.
-      { label: "Time Schedule", action: "schedule" },
+      // Opening-hours popup (ScheduleModal).
+      { labelKey: "footer.link.timeSchedule", action: "schedule" },
       { labelKey: "footer.link.faqs", href: "/#faq" },
     ],
   },
@@ -144,7 +142,7 @@ export function Footer() {
                 href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Dynamic Fitness on Instagram"
+                aria-label={t("footer.social.instagramAria")}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/40 hover:text-white"
               >
                 <InstagramIcon />
@@ -153,7 +151,7 @@ export function Footer() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Message Dynamic Fitness on WhatsApp"
+                aria-label={t("footer.social.whatsappAria")}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/40 hover:text-white"
               >
                 <MessageCircle className="h-4 w-4" strokeWidth={1.5} aria-hidden />
@@ -170,7 +168,7 @@ export function Footer() {
                 kind="plain"
                 wrapperClassName="h-20 w-14"
                 src="https://ebadge.bestweb.lk/eBadgeSystem/domainNames/dynamicfitness.lk/BestWeb/2025/Rate_Us/image.png"
-                alt="BestWeb 2025"
+                alt={t("footer.bestWebAlt")}
                 className="h-full w-full object-contain"
               />
             </a>
@@ -179,34 +177,33 @@ export function Footer() {
           {/* Link columns */}
           {linkGroups.map((group) => (
             <div key={group.titleKey}>
-              <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.2em] text-white/50">
+              <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.2em] text-white/70">
                 {t(group.titleKey)}
               </p>
               <ul className="flex flex-col gap-3">
                 {group.links.map((link) => {
                   if ("action" in link) {
                     return (
-                      <li key={link.action}>
+                      <li key={link.labelKey}>
                         <button
                           type="button"
                           onClick={() => setScheduleOpen(true)}
                           className="cursor-pointer text-left text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                         >
-                          {link.label}
+                          {t(link.labelKey)}
                         </button>
                       </li>
                     );
                   }
                   const isExternal = /^https?:/i.test(link.href);
-                  const label = "labelKey" in link ? t(link.labelKey) : link.label;
                   return (
-                    <li key={"labelKey" in link ? link.labelKey : link.href}>
+                    <li key={link.labelKey}>
                       <a
                         href={localizeHref(link.href, current)}
                         {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
                         className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                       >
-                        {label}
+                        {t(link.labelKey)}
                       </a>
                     </li>
                   );
@@ -261,11 +258,11 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-white/40">
+            <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-white/70">
               {t("footer.hours")}
             </span>
           </div>
-          <div className="flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.1em] text-white/40">
+          <div className="flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.1em] text-white/70">
             <a href={localizeHref("/privacy-policy", current)} className="transition-colors hover:text-white">
               {t("footer.legal.privacy")}
             </a>
@@ -275,7 +272,7 @@ export function Footer() {
             <a href={localizeHref("/cookie-policy", current)} className="transition-colors hover:text-white">
               {t("footer.legal.cookies")}
             </a>
-            <span>© 2026 Dynamic Fitness</span>
+            <span>{t("footer.copyright")}</span>
           </div>
         </div>
       </div>

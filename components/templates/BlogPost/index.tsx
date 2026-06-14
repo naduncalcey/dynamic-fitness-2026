@@ -14,13 +14,15 @@ import { authorAvatarUrl, type BlogPostEntry } from "@/lib/contentful/blog/types
 
 type BlogPostTemplateProps = {
   post: BlogPostEntry;
+  /** URL-slug locale ("en" | "si"), used to localize the published date. */
+  locale?: string;
 };
 
 const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
 
-export function BlogPostTemplate({ post }: BlogPostTemplateProps) {
+export function BlogPostTemplate({ post, locale = "en" }: BlogPostTemplateProps) {
   const { title, category, publishedDate, author, coverImage, body } = post;
-  const date = formatBlogDate(publishedDate);
+  const date = formatBlogDate(publishedDate, locale);
   const jsonLd = blogPostJsonLd(post);
 
   return (
@@ -57,8 +59,8 @@ export function BlogPostTemplate({ post }: BlogPostTemplateProps) {
             ) : null}
             <div className="flex flex-wrap items-center gap-x-2">
               {author?.name ? <span className="text-white/80">{author.name}</span> : null}
-              {author?.role ? <span className="text-white/40">· {author.role}</span> : null}
-              {date ? <span className="text-white/40">· {date}</span> : null}
+              {author?.role ? <span className="text-white/70">· {author.role}</span> : null}
+              {date ? <span className="text-white/70">· {date}</span> : null}
             </div>
           </div>
         </div>

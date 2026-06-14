@@ -113,9 +113,25 @@ export function Header() {
   const current = getLocaleFromPathname(pathname);
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+  const mobileMenuId = "mobile-menu";
+
+  // While the mobile menu is open, close on Escape and lock body scroll.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open]);
 
   return (
-    <>
+    <header>
       <nav className="relative z-50 border-t border-white/20">
         <div className={`py-[20px] lg:border-x lg:border-white/20 ${CONTAINER}`}>
           <div className="flex items-center justify-between">
@@ -145,6 +161,7 @@ export function Header() {
               className="relative flex h-8 w-8 cursor-pointer flex-col items-center justify-center gap-[6px] md:hidden"
               aria-label={t("header.toggleMenu")}
               aria-expanded={open}
+              aria-controls={mobileMenuId}
             >
               <span
                 className={`block h-px w-5 bg-white transition-all duration-300 ${
@@ -161,8 +178,12 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Full-screen mobile menu */}
+      {/* Full-screen mobile menu. `inert` when closed removes it from the tab
+          order and accessibility tree while preserving the opacity fade. */}
       <div
+        id={mobileMenuId}
+        aria-hidden={!open}
+        inert={!open}
         className={`fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-black transition-all duration-300 md:hidden ${
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
@@ -199,7 +220,7 @@ export function Header() {
           })}
         </div>
       </div>
-    </>
+    </header>
   );
 }
 

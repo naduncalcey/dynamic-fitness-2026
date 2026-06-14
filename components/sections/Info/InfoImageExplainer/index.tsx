@@ -4,7 +4,7 @@ import type { ImageEntry } from "@/lib/contentful/common/types";
 import type { InfoSection } from "@/lib/sections/types";
 import { CursorTooltip } from "../CursorTooltip";
 import { SkeletonImage } from "@/components/common/SkeletonImage";
-import { Sparkle } from "lucide-react";
+import { AiBadge } from "./AiBadge";
 
 /**
  * Info - Image Explainer. Recreates the old site's About section: a two-column
@@ -101,7 +101,7 @@ export function InfoImageExplainer({ section }: InfoImageExplainerProps) {
           <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-white/10 pt-10 md:mt-16 md:gap-8 md:pt-12">
             {stats.map((stat, i) => (
               <div key={`${stat.label}-${i}`}>
-                <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/40 md:text-xs">
+                <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/70 md:text-xs">
                   {stat.label}
                 </dt>
                 <dd className="mt-3 font-serif text-4xl font-normal tracking-tight text-white sm:text-5xl md:text-6xl">
@@ -121,11 +121,8 @@ export function InfoImageExplainer({ section }: InfoImageExplainerProps) {
                 sizes="(max-width: 1240px) 100vw, 1240px"
                 imgClassName="h-[280px] w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105 sm:h-[380px] md:h-[480px] lg:h-[600px]"
               />
-              {/* AI Enhanced badge */}
-              <span className="pointer-events-none absolute right-4 top-4 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-white backdrop-blur-md">
-                <Sparkle className="h-3 w-3 text-red-400" fill="currentColor" strokeWidth={1.5} aria-hidden />
-                AI Enhanced
-              </span>
+              {/* AI Enhanced badge (client island for localization) */}
+              <AiBadge />
             </div>
           </CursorTooltip>
         ) : null}
