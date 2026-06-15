@@ -63,11 +63,27 @@ export function HeroDefault({ section }: HeroDefaultProps) {
           {/* Dark overlay for text contrast. */}
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-black/40" />
 
+          {/* BestWeb.lk 2026 competition badge. */}
+          <a
+            href="https://ebadge.bestweb.lk/api/v1/clicked/dynamicfitness.lk/TopWeb/2026-June/Qualified"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-2 inline-block"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://ebadge.bestweb.lk/eBadgeSystem/domainNames/dynamicfitness.lk/TopWeb/2026-June/Qualified/image.png"
+              alt="BestWeb.lk 2026 Top Website Qualified badge"
+              width={100}
+              height={100}
+            />
+          </a>
+
           {eyebrow ? (
             <p className="mb-4 text-sm uppercase tracking-[0.2em] text-red-400">{eyebrow}</p>
           ) : null}
 
-          <h1 className="pt-[20px] pb-[20px] text-[38px] font-normal leading-[42px] tracking-[-0.8px] text-white md:pt-[40px] md:text-[72px] md:leading-[72px] md:tracking-[-1.8px]">
+          <h1 className="pt-[20px] pb-[20px] text-[38px] font-normal leading-[42px] tracking-[-0.8px] text-white md:pt-[32px] md:text-[72px] md:leading-[72px] md:tracking-[-1.8px]">
             {headline}
             {highlightText ? (
               <>
