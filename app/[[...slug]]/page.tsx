@@ -8,8 +8,12 @@ import { splitLocaleFromSlug, LOCALE_MAP, DEFAULT_LOCALE, localizeHref, type Loc
 import { absoluteUrl, blogPostMetadata, gymJsonLd, faqJsonLd, jobPostingsJsonLd, SITE_NAME, ogLocale, ogAlternateLocales, localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/common/JsonLd";
 import { BackToTop } from "@/components/common/BackToTop";
+import { SitemapView } from "@/components/common/SitemapView";
 import { getFlexiblePageEntries, getBlogPostEntries } from "@/lib/contentful/sitemap";
 import type { Section, SeoEntry } from "@/lib/sections/types";
+
+/** Fixed utility route (not a Contentful page): the human-readable HTML sitemap. */
+const isSitemapPath = (rest: string[]) => rest.length === 1 && rest[0] === "sitemap";
 
 /** Collect Q&A items from any "Accordion - FAQ" sections on the page. */
 const collectFaqItems = (sections: Section[]) =>
@@ -59,7 +63,13 @@ export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
 
   return LOCALE_MAP.flatMap((locale) => {
     const prefix = locale.urlSlug === DEFAULT_LOCALE.urlSlug ? [] : [locale.urlSlug];
-    return basePaths.map((segs) => ({ slug: [...prefix, ...segs] }));
+    const paths = basePaths.map((segs) => ({ slug: [...prefix, ...segs] }));
+    // Non-default locales also get a localized HTML sitemap (e.g. /si/sitemap).
+    // The default locale's /sitemap is served by the fixed app/sitemap/page.tsx.
+    if (locale.urlSlug !== DEFAULT_LOCALE.urlSlug) {
+      paths.push({ slug: [...prefix, "sitemap"] });
+    }
+    return paths;
   });
 }
 
@@ -134,6 +144,16 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const { locale, rest } = splitLocaleFromSlug(slug);
 
+  if (isSitemapPath(rest)) {
+    const path = "/sitemap";
+    return {
+      title: "Sitemap",
+      description:
+        "A complete, human-readable index of every page on the Dynamic Fitness website.",
+      alternates: { canonical: absoluteUrl(localizeHref(path, locale)), languages: localeAlternates(path) },
+    };
+  }
+
   const postSlug = blogPostSlug(rest);
   if (postSlug) {
     const post = await getBlogPostBySlug(postSlug, { locale: locale.contentfulCode });
@@ -150,6 +170,11 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
 export default async function FlexiblePageRoute({ params }: PageProps) {
   const { slug } = await params;
   const { locale, rest } = splitLocaleFromSlug(slug);
+
+  // Localized HTML sitemap (e.g. /si/sitemap) → shared view, no Contentful page.
+  if (isSitemapPath(rest)) {
+    return <SitemapView locale={locale} />;
+  }
 
   // Blog post detail (/blog/<slug>) → fixed post template.
   const postSlug = blogPostSlug(rest);

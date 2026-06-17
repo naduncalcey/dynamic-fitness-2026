@@ -14,11 +14,15 @@ const PAGE_SIZE = 100; // Contentful GraphQL collection cap per request
 export type SitemapEntry = {
   /** Page path ("/", "/careers") or bare blog slug — caller builds the URL. */
   slug: string;
+  /** Display name (FlexiblePage `pageTitle` / BlogPost `title`), for the HTML sitemap. */
+  title?: string | null;
   lastModified?: string | null;
 };
 
 type CollectionItem = {
   slug?: string | null;
+  pageTitle?: string | null;
+  title?: string | null;
   sys?: { publishedAt?: string | null } | null;
   seo?: { seoNoIndex?: boolean | null } | null;
 };
@@ -34,6 +38,7 @@ const FLEXIBLE_PAGE_SITEMAP = /* GraphQL */ `
       total
       items {
         slug
+        pageTitle
         sys { publishedAt }
         seo { seoNoIndex }
       }
@@ -47,6 +52,7 @@ const BLOG_POST_SITEMAP = /* GraphQL */ `
       total
       items {
         slug
+        title
         sys { publishedAt }
         seo { seoNoIndex }
       }
@@ -79,7 +85,11 @@ async function fetchAll(query: string): Promise<CollectionItem[]> {
 function toEntries(items: CollectionItem[]): SitemapEntry[] {
   return items
     .filter((i) => !i.seo?.seoNoIndex && typeof i.slug === "string" && i.slug.length > 0)
-    .map((i) => ({ slug: i.slug as string, lastModified: i.sys?.publishedAt ?? null }));
+    .map((i) => ({
+      slug: i.slug as string,
+      title: i.pageTitle ?? i.title ?? null,
+      lastModified: i.sys?.publishedAt ?? null,
+    }));
 }
 
 export async function getFlexiblePageEntries(): Promise<SitemapEntry[]> {

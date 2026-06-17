@@ -24,7 +24,8 @@ const CONTAINER = "mx-auto w-full max-w-[1240px] px-6 lg:px-10";
 // "Time Schedule" is the exception — instead of navigating, it opens the
 // opening-hours popup (ScheduleModal), kept entirely in the frontend.
 type FooterLink =
-  | { labelKey: string; href: string } // navigates to href
+  // navigates to href; `fallbackLabel` shows until the Contentful uiLabel exists
+  | { labelKey: string; href: string; fallbackLabel?: string }
   | { labelKey: string; action: "schedule" }; // opens the opening-hours popup
 
 type FooterLinkGroup = { titleKey: string; links: FooterLink[] };
@@ -56,6 +57,9 @@ const linkGroups: FooterLinkGroup[] = [
       { labelKey: "footer.link.careers", href: "/careers" },
       { labelKey: "footer.link.blog", href: "/blog" },
       { labelKey: "footer.link.contact", href: "/contact" },
+      // Human-readable HTML sitemap (app/sitemap/page.tsx + the localized
+      // /<locale>/sitemap variant), the companion to /sitemap.xml.
+      { labelKey: "footer.link.sitemap", href: "/sitemap", fallbackLabel: "Sitemap" },
     ],
   },
 ];
@@ -66,6 +70,7 @@ const CONTACT_PHONE_DISPLAY = "+94 77 240 3117";
 const CONTACT_PHONE_HREF = "tel:+94772403117";
 const INSTAGRAM_URL = "https://www.instagram.com/dynamicfitness.lk";
 const WHATSAPP_URL = "https://wa.me/94772403117";
+const LINKEDIN_URL = "https://www.linkedin.com/company/100536682";
 
 // Instagram stays an inline SVG: lucide-react intentionally omits trademarked
 // brand marks (no Instagram icon). WhatsApp uses Lucide's MessageCircle, the
@@ -80,12 +85,21 @@ function InstagramIcon() {
   );
 }
 
+// LinkedIn's mark is also trademarked (no Lucide icon), so it's an inline SVG.
+function LinkedInIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z" />
+    </svg>
+  );
+}
+
 const CTA_LINK = "https://calendly.com/nadun-n-dynamicfitness/30min";
 const BRAND_TEXT = "DYNAMIC";
 // Postal address stays in English (proper nouns) regardless of locale.
 const ADDRESS_LINES = [
   "Dynamic Fitness (Pvt) Ltd.",
-  "14 Dewananada Road,",
+  "14 Sri Devananda Road,",
   "Nawinna,",
   "Maharagama",
 ];
@@ -106,6 +120,12 @@ export function Footer() {
     el.style.setProperty("--spot-x", `${e.clientX - rect.left}px`);
     el.style.setProperty("--spot-y", `${e.clientY - rect.top}px`);
   };
+
+  // t() returns the key when a label is missing; fall back to a real string so
+  // the LinkedIn icon never exposes a raw key to screen readers.
+  const linkedinAriaRaw = t("footer.social.linkedinAria");
+  const linkedinAria =
+    linkedinAriaRaw === "footer.social.linkedinAria" ? "Dynamic Fitness on LinkedIn" : linkedinAriaRaw;
 
   return (
     <footer className="w-full border-y border-white/20 bg-black text-white">
@@ -156,6 +176,15 @@ export function Footer() {
               >
                 <MessageCircle className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               </a>
+              <a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={linkedinAria}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/40 hover:text-white"
+              >
+                <LinkedInIcon />
+              </a>
             </div>
 
             <a
@@ -196,6 +225,10 @@ export function Footer() {
                     );
                   }
                   const isExternal = /^https?:/i.test(link.href);
+                  // t() returns the key itself when a label is missing; fall back
+                  // to the literal label so a new link never shows a raw key.
+                  const label = t(link.labelKey);
+                  const text = label === link.labelKey && link.fallbackLabel ? link.fallbackLabel : label;
                   return (
                     <li key={link.labelKey}>
                       <a
@@ -203,7 +236,7 @@ export function Footer() {
                         {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
                         className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
                       >
-                        {t(link.labelKey)}
+                        {text}
                       </a>
                     </li>
                   );

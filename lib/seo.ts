@@ -24,10 +24,13 @@ export const BUSINESS = {
   legalName: LEGAL_NAME,
   telephone: "+94772403117",
   // Public social profiles (sameAs) reinforce entity identity for search/AI.
-  sameAs: ["https://www.instagram.com/dynamicfitness.lk"],
+  sameAs: [
+    "https://www.instagram.com/dynamicfitness.lk",
+    "https://www.linkedin.com/company/100536682",
+  ],
   priceRange: "Rs 6,000 – Rs 58,000",
   address: {
-    street: "14 Dewananada Road, Nawinna",
+    street: "14 Sri Devananda Road, Nawinna",
     locality: "Maharagama",
     region: "Western Province",
     country: "LK",
