@@ -105,6 +105,8 @@ export type ReviewEntry = {
   sys: { id: string };
   authorName?: string | null;
   avatarUrl?: string | null;
+  /** Optional custom avatar Image entry. When set it overrides `avatarUrl`. */
+  image?: ImageEntry | null;
   rating?: number | null;
   quote?: string | null;
   timeAgo?: string | null;

@@ -181,6 +181,13 @@ const LABELS = [
   ["pricing.individual", "pricing", "Individual", "තනි පුද්ගල"],
   ["pricing.couple", "pricing", "Couple", "යුවළ"],
   ["pricing.toggleAria", "pricing", "Toggle individual or couple pricing", "තනි හෝ යුවළ මිල ගණන් මාරු කරන්න"],
+
+  // Testimonials carousel (aria labels)
+  ["testimonials.label", "testimonials", "Customer testimonials", "පාරිභෝගික සාක්ෂි"],
+  ["testimonials.choose", "testimonials", "Choose a testimonial to show", "පෙන්වීමට සාක්ෂියක් තෝරන්න"],
+  ["testimonials.show", "testimonials", "Show testimonial {n}", "සාක්ෂිය {n} පෙන්වන්න"],
+  ["testimonials.previous", "testimonials", "Previous testimonial", "පෙර සාක්ෂිය"],
+  ["testimonials.next", "testimonials", "Next testimonial", "ඊළඟ සාක්ෂිය"],
 ];
 
 const entryId = (key) => `uilabel-${key.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;

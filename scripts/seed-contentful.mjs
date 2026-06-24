@@ -393,6 +393,15 @@ const REVIEW_TYPE = {
     { id: "internalName", name: "Internal Name", type: "Symbol", required: true },
     { id: "authorName", name: "Author Name", type: "Symbol" },
     { id: "avatarUrl", name: "Avatar URL", type: "Symbol" },
+    {
+      // Optional custom avatar. When set, the section renders this Image entry
+      // and ignores `avatarUrl`.
+      id: "image",
+      name: "Avatar Image",
+      type: "Link",
+      linkType: "Entry",
+      validations: [{ linkContentType: ["image"] }],
+    },
     { id: "rating", name: "Rating (1-5)", type: "Integer" },
     { id: "quote", name: "Quote", type: "Text" },
     { id: "timeAgo", name: "Time Ago", type: "Symbol" },

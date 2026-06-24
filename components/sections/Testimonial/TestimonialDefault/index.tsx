@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import type { ReviewEntry } from "@/lib/contentful/common/types";
 import type { TestimonialSection } from "@/lib/sections/types";
 import { SkeletonImage } from "@/components/common/SkeletonImage";
+import { ResponsiveImage } from "@/components/common/ResponsiveImage";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
-import { Star } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
  * Testimonial - Default. Recreates the old site's single-testimonial carousel:
@@ -67,6 +68,10 @@ export function TestimonialDefault({ section }: TestimonialDefaultProps) {
   const current: ReviewEntry = reviews[index] ?? reviews[0];
   const multiple = reviews.length > 1;
 
+  // Manual navigation, wrapping at both ends.
+  const goPrev = () => setIndex((i) => (i - 1 + reviews.length) % reviews.length);
+  const goNext = () => setIndex((i) => (i + 1) % reviews.length);
+
   return (
     <section
       className="w-full border-t border-white/20 bg-black"
@@ -77,7 +82,28 @@ export function TestimonialDefault({ section }: TestimonialDefaultProps) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className={`py-[60px] md:py-[80px] lg:py-[120px] lg:border-x lg:border-white/20 ${CONTAINER}`}>
+      <div className={`relative py-[60px] md:py-[80px] lg:py-[120px] lg:border-x lg:border-white/20 ${CONTAINER}`}>
+        {/* Manual prev/next arrows, flanking the quote on the sides. */}
+        {multiple ? (
+          <>
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label={t("testimonials.previous")}
+              className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 lg:left-4"
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              aria-label={t("testimonials.next")}
+              className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 lg:right-4"
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden />
+            </button>
+          </>
+        ) : null}
         <div className="mx-auto flex min-h-[280px] max-w-3xl flex-col items-center justify-center text-center sm:min-h-[260px] md:min-h-[300px] lg:min-h-[320px]">
           <StarRating rating={current.rating ?? 5} />
 
@@ -90,7 +116,15 @@ export function TestimonialDefault({ section }: TestimonialDefaultProps) {
           </blockquote>
 
           <div key={`author-${index}`} className="animate-fade-up mt-10 flex items-center gap-3">
-            {current.avatarUrl ? (
+            {/* Custom Image entry takes precedence over the plain avatar URL. */}
+            {current.image?.desktop?.url ? (
+              <ResponsiveImage
+                image={current.image}
+                sizes="40px"
+                className="h-10 w-10 shrink-0 overflow-hidden rounded-full"
+                imgClassName="h-10 w-10 rounded-full object-cover"
+              />
+            ) : current.avatarUrl ? (
               <SkeletonImage
                 kind="plain"
                 wrapperClassName="h-10 w-10 shrink-0"
