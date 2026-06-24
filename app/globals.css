@@ -100,10 +100,29 @@
   animation: skeletonShimmer 1.6s ease-in-out infinite;
 }
 
+/* Chat typing indicator — three dots bouncing in sequence (staggered inline). */
+@keyframes chatDot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.animate-chat-dot {
+  animation: chatDot 1.2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ds-skeleton,
   .animate-marquee,
-  .animate-fade-up {
+  .animate-fade-up,
+  .animate-chat-dot {
     animation: none !important;
   }
   html {

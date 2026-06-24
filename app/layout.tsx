@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsent } from "@/components/common/CookieConsent";
 import { BackgroundMusic } from "@/components/common/BackgroundMusic";
+import { ChatWidget } from "@/components/common/ChatWidget";
 import { JsonLd } from "@/components/common/JsonLd";
 import { organizationJsonLd, webSiteJsonLd, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { LabelsProvider } from "@/lib/i18n/LabelsProvider";
@@ -82,6 +83,7 @@ export default async function RootLayout({
           <Footer />
           <CookieConsent />
           <BackgroundMusic />
+          <ChatWidget />
         </LabelsProvider>
       </body>
     </html>

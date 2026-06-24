@@ -5,6 +5,7 @@ import {
   getLlmsPosts,
   getLlmsPricing,
 } from "@/lib/contentful/llms";
+import { HERO as AMENITIES_HERO, AMENITIES } from "@/components/sections/Info/InfoAmenities/amenities";
 
 /**
  * Builders for /llms.txt (a curated guide for AI) and /llms-full.txt (the full
@@ -30,6 +31,14 @@ function businessFacts(): string {
     `- Opening hours: ${hoursText}`,
     `- Membership price range: ${priceRange}`,
     `- Website: ${SITE_URL}`,
+  ].join("\n");
+}
+
+/** The gym's facilities, from the shared amenities list (English copy). */
+function amenitiesText(): string {
+  return [
+    `- ${AMENITIES_HERO.en.eyebrow}: ${AMENITIES_HERO.en.caption}`,
+    ...AMENITIES.map((a) => `- ${a.en.label}: ${a.en.desc}`),
   ].join("\n");
 }
 
@@ -85,6 +94,9 @@ export async function buildLlmsFullTxt(): Promise<string> {
     "",
     "## About",
     businessFacts(),
+    "",
+    "## Amenities & Facilities",
+    amenitiesText(),
   ];
 
   if (pricing.length) {

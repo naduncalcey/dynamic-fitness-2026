@@ -188,6 +188,22 @@ const LABELS = [
   ["testimonials.show", "testimonials", "Show testimonial {n}", "සාක්ෂිය {n} පෙන්වන්න"],
   ["testimonials.previous", "testimonials", "Previous testimonial", "පෙර සාක්ෂිය"],
   ["testimonials.next", "testimonials", "Next testimonial", "ඊළඟ සාක්ෂිය"],
+
+  // AI chat assistant widget
+  ["chat.launch", "chat", "Chat with Sajani", "සජනී සමඟ කතා කරන්න"],
+  ["chat.title", "chat", "Sajani · Dynamic Fitness", "සජනී · ඩයිනමික් ෆිට්නස්"],
+  ["chat.close", "chat", "Close chat", "කතාබහ වසන්න"],
+  ["chat.greeting", "chat", "Hey there! 👋 I'm Sajani, your Dynamic Fitness buddy. Ask me about memberships, hours, classes, facilities — let's get you moving! 💪", "ආයුබෝවන්! 👋 මම සජනී, ඔබේ ඩයිනමික් ෆිට්නස් සහායිකාව. සාමාජිකත්වය, වේලාවන්, පන්ති, පහසුකම් ගැන අසන්න — අපි පටන් ගමු! 💪"],
+  ["chat.placeholder", "chat", "Ask Sajani about memberships, hours, classes…", "සජනීගෙන් සාමාජිකත්වය, වේලාවන්, පන්ති ගැන අසන්න…"],
+  ["chat.send", "chat", "Send", "යවන්න"],
+  ["chat.typing", "chat", "Sajani is typing", "සජනී ටයිප් කරමින් සිටී"],
+  ["chat.error", "chat", "Something went wrong. Please try again or contact us.", "යම් දෝෂයක් ඇති විය. කරුණාකර නැවත උත්සාහ කරන්න හෝ අප හා සම්බන්ධ වන්න."],
+  ["chat.retry", "chat", "Retry", "නැවත උත්සාහ කරන්න"],
+  ["chat.disclaimer", "chat", "AI assistant — please confirm important details with the gym.", "AI සහයක — වැදගත් තොරතුරු ව්‍යායාම්ශාලාව සමඟ තහවුරු කර ගන්න."],
+  ["chat.suggest.pricing", "chat", "What are your membership prices?", "ඔබගේ සාමාජික මිල ගණන් මොනවාද?"],
+  ["chat.suggest.hours", "chat", "What are your opening hours?", "ඔබගේ විවෘත වේලාවන් මොනවාද?"],
+  ["chat.suggest.classes", "chat", "What classes do you offer?", "ඔබ පිරිනමන පන්ති මොනවාද?"],
+  ["chat.suggest.location", "chat", "Where are you located?", "ඔබ පිහිටා ඇත්තේ කොහේද?"],
 ];
 
 const entryId = (key) => `uilabel-${key.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
