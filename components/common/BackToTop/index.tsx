@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
+import { useFloatingButtons } from "@/components/common/FloatingButtonsProvider";
 
 /**
  * Floating circular "back to top" button with a scroll-progress ring. Fixed
@@ -28,6 +29,7 @@ export function BackToTop() {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
   const t = useLabels();
+  const { setBackToTopVisible } = useFloatingButtons();
 
   useEffect(() => {
     const onScroll = () => {
@@ -44,6 +46,15 @@ export function BackToTop() {
       window.removeEventListener("resize", onScroll);
     };
   }, []);
+
+  // Tell the floating-button dock whether we're showing, so the music button
+  // can sit above us (when visible) or drop to the bottom (when hidden). Reset
+  // to false on unmount so pages without a BackToTop don't leave it stuck.
+  useEffect(() => {
+    setBackToTopVisible(visible);
+  }, [visible, setBackToTopVisible]);
+
+  useEffect(() => () => setBackToTopVisible(false), [setBackToTopVisible]);
 
   return (
     <button

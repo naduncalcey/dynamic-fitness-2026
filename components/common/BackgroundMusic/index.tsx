@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { useLabels } from "@/lib/i18n/LabelsProvider";
+import { useFloatingButtons } from "@/components/common/FloatingButtonsProvider";
 
 /**
  * Site-wide background music toggle. Rendered once in the root layout so the
@@ -24,6 +25,9 @@ export function BackgroundMusic() {
   // Muted/paused until the visitor clicks; synced to the audio's play/pause events.
   const [playing, setPlaying] = useState(false);
   const t = useLabels();
+  // When BackToTop is showing, sit above it (bottom-24); otherwise drop to the
+  // bottom slot (bottom-6) so the button isn't floating with empty space below.
+  const { backToTopVisible } = useFloatingButtons();
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -55,7 +59,9 @@ export function BackgroundMusic() {
         onClick={toggle}
         aria-label={playing ? t("a11y.muteMusic") : t("a11y.playMusic")}
         aria-pressed={playing}
-        className="group fixed bottom-24 right-6 z-30 grid size-14 place-items-center rounded-full border border-white/15 bg-[var(--cta-surface)] text-white/70 backdrop-blur-md transition-all duration-300 hover:border-[var(--cta-red-border)] hover:text-white"
+        className={`group fixed right-6 z-30 grid size-14 place-items-center rounded-full border border-white/15 bg-[var(--cta-surface)] text-white/70 backdrop-blur-md transition-all duration-300 hover:border-[var(--cta-red-border)] hover:text-white ${
+          backToTopVisible ? "bottom-24" : "bottom-6"
+        }`}
       >
         {playing ? (
           <Volume2 className="size-5" strokeWidth={1.5} aria-hidden />

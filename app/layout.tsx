@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CookieConsent } from "@/components/common/CookieConsent";
 import { BackgroundMusic } from "@/components/common/BackgroundMusic";
 import { ChatWidget } from "@/components/common/ChatWidget";
+import { FloatingButtonsProvider } from "@/components/common/FloatingButtonsProvider";
 import { JsonLd } from "@/components/common/JsonLd";
 import { organizationJsonLd, webSiteJsonLd, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { LabelsProvider } from "@/lib/i18n/LabelsProvider";
@@ -76,14 +77,17 @@ export default async function RootLayout({
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={webSiteJsonLd()} />
         <LabelsProvider labels={labels}>
-          {/* Skip link first; localized, so it renders inside LabelsProvider. */}
-          <SkipLink />
-          <Header />
-          {children}
-          <Footer />
-          <CookieConsent />
-          <BackgroundMusic />
-          <ChatWidget />
+          {/* Coordinates the bottom-right floating buttons (BackToTop ↔ music). */}
+          <FloatingButtonsProvider>
+            {/* Skip link first; localized, so it renders inside LabelsProvider. */}
+            <SkipLink />
+            <Header />
+            {children}
+            <Footer />
+            <CookieConsent />
+            <BackgroundMusic />
+            <ChatWidget />
+          </FloatingButtonsProvider>
         </LabelsProvider>
       </body>
     </html>
