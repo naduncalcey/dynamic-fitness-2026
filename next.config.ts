@@ -6,9 +6,11 @@ import type { NextConfig } from "next";
  * 'self'`). Built from an audit of the codebase:
  *
  *  - script-src   self + Next.js inline bootstrap/JSON-LD (`'unsafe-inline'`),
- *                 Cloudflare Turnstile, and the UnicornStudio WebGL runtime
- *                 (jsDelivr). `'unsafe-eval'` is added in dev only (React Fast
- *                 Refresh needs it); it is NOT shipped to production.
+ *                 Cloudflare Turnstile, the UnicornStudio WebGL runtime
+ *                 (jsDelivr), and Google AdSense (googlesyndication /
+ *                 doubleclick / adtrafficquality). `'unsafe-eval'` is added in
+ *                 dev only (React Fast Refresh needs it); it is NOT shipped to
+ *                 production.
  *  - style-src    self + Tailwind/Next inline styles + next/font.
  *  - img-src      Contentful CDN, the BestWeb badge, picsum (preview route),
  *                 plus data:/blob: for inline + optimized images.
@@ -28,16 +30,16 @@ const isDev = process.env.NODE_ENV === "development";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com https://cdn.jsdelivr.net`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep2.adtrafficquality.google`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.ctfassets.net https://picsum.photos https://ebadge.bestweb.lk https://assets.unicorn.studio https://storage.googleapis.com",
+  "img-src 'self' data: blob: https://images.ctfassets.net https://picsum.photos https://ebadge.bestweb.lk https://assets.unicorn.studio https://storage.googleapis.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://www.google.com",
   "font-src 'self' data:",
   // UnicornStudio fetches its scene JSON + textures from one of these two
   // bases (storage.googleapis.com by default, assets.unicorn.studio in
   // production mode), so both must be reachable for fetch AND image loads.
-  "connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://assets.unicorn.studio https://storage.googleapis.com",
+  "connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://assets.unicorn.studio https://storage.googleapis.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google https://csi.gstatic.com",
   "media-src 'self'",
-  "frame-src https://challenges.cloudflare.com https://www.youtube.com https://player.vimeo.com https://www.google.com",
+  "frame-src https://challenges.cloudflare.com https://www.youtube.com https://player.vimeo.com https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep2.adtrafficquality.google",
   "worker-src 'self' blob:",
   "frame-ancestors 'self'",
   "base-uri 'self'",
