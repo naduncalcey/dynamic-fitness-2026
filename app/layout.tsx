@@ -71,12 +71,6 @@ export default async function RootLayout({
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        {/* Google AdSense — React 19 hoists async scripts into <head> during SSR. */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9459314240825634"
-          crossOrigin="anonymous"
-        />
         {/* Sync <html lang> to the URL locale on the client (keeps ISR static). */}
         <HtmlLangSync />
         {/* Sitewide structured data: brand entity + search endpoint. */}
