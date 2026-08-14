@@ -1,0 +1,99 @@
+/*
+ * Orange marquee bar — port of the source's "Ticker 1: Orange BG".
+ * Shared by the About and Programs sections (and any section that follows the
+ * same rhythm). Motion: 100px/s leftward, runs only while on screen.
+ *
+ * Theme colours (--blush, --red, …) come from app/globals.css.
+ */
+
+.ticker {
+  display: flex;
+  width: 100%;
+  height: 64px;
+  align-items: center;
+  padding: 10px 0;
+  overflow: hidden;
+  background: var(--red);
+}
+
+/* Four identical sets; one loop slides exactly one set (-25% of the track).
+ * Duration is set from JS as width/100 so the speed is the source's 100px/s. */
+.tickerTrack {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: tickerScroll var(--ticker-dur, 20s) linear infinite;
+}
+
+/* The source ticker only runs while on screen. */
+.ticker[data-paused="true"] .tickerTrack {
+  animation-play-state: paused;
+}
+
+.tickerSet {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding-right: 40px; /* keeps the inter-set gap inside the -25% period */
+}
+
+.tickerText {
+  margin: 0;
+  color: var(--blush);
+  font-family: var(--font-clash), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  font-size: 25px;
+  line-height: 34px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  white-space: pre; /* the bullets carry three spaces each side */
+}
+
+@keyframes tickerScroll {
+  to {
+    transform: translateX(-25%);
+  }
+}
+
+/* 39px icon boxes; each glyph is inset inside its box as in the design. */
+.tickerIcon {
+  position: relative;
+  width: 39px;
+  height: 39px;
+  flex: none;
+}
+
+.tickerIcon img {
+  position: absolute;
+  width: auto;
+  height: auto;
+}
+
+.icoBoxing img {
+  top: 6.25%;
+  right: 12.5%;
+  bottom: 9.38%;
+  left: 9.38%;
+}
+
+.icoThunder img {
+  top: 3.14%;
+  right: 15.63%;
+  bottom: 3.14%;
+  left: 15.61%;
+}
+
+.icoDumbbell img {
+  top: 18.75%;
+  right: 0;
+  bottom: 18.75%;
+  left: 0;
+}
+
+/* ========================================================= reduced motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .tickerTrack {
+    animation: none;
+  }
+}

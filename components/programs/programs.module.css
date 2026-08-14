@@ -1,0 +1,720 @@
+/*
+ * Programs section — port of the Rep Republic "Find Your Program" section.
+ *
+ * Breakpoints mirror the source exactly:
+ *   phone   0 – 809px
+ *   tablet  810 – 1199px
+ *   desktop 1200px +
+ *
+ * Layout: heading column (sticky at 120px on desktop) beside a stack of five
+ * sticky program cards. Each card wrapper pins at a staggered offset —
+ * 120px + 70px per card on desktop/tablet, 90px + 50px on phone — so the
+ * cards pile up over one another as you scroll, exactly as on the source.
+ *
+ * All motion values are transcribed from the source's `framer/appear` JSON
+ * and page-chunk effect definitions; the springs are exact ODE solutions
+ * sampled into `linear()`.
+ *
+ * Theme colours (--blush, --red, --ink, …) come from app/globals.css.
+ */
+
+.programs {
+  /* Rides over the pinned banner (source: z-index 5). */
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 120px;
+  padding: 0 0 120px;
+  background: var(--blush);
+
+  font-family: var(--font-inter), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss07", "ss08", "salt";
+  font-variation-settings: "opsz" 32;
+
+  --stick-base: 120px;
+  --stick-step: 70px;
+}
+
+.container {
+  display: flex;
+  width: 1120px;
+  max-width: 100%;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ---------------------------------------------------------- heading column */
+
+/* Pins while the card stack scrolls past (desktop only). */
+.headingCol {
+  position: sticky;
+  top: 120px;
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.headingBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tabIcon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.tabIcon img {
+  position: absolute;
+  top: 15.63%;
+  right: 9.38%;
+  bottom: 15.63%;
+  left: 9.38%;
+  width: auto;
+  height: auto;
+}
+
+.tabText {
+  margin: 0;
+  color: var(--red);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.heading {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-clash), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  font-size: 88px;
+  line-height: 88px;
+  font-weight: 600;
+  letter-spacing: -3px;
+}
+
+.subcopy {
+  margin: 0;
+  color: var(--grey);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+/* ------------------------------------------------------------ Ask CEO card */
+
+.askSlot {
+  display: inline-flex;
+}
+
+.askCeo {
+  display: flex;
+  width: 256px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 5px;
+  background: var(--ink);
+  text-decoration: none;
+}
+
+.askAvatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex: none;
+  overflow: hidden;
+  border-radius: 2.5px;
+  background: var(--ink);
+}
+
+/* Source hover: the avatar grows to 116%. */
+.askAvatar img {
+  object-fit: cover;
+  transition: transform 0.4s var(--flipEase);
+}
+
+.askCeo:hover .askAvatar img,
+.askCeo:focus-visible .askAvatar img {
+  transform: scale(1.16);
+}
+
+.askContent {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.askHeadRow {
+  position: relative;
+  display: flex;
+  height: 21px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.askTitle {
+  color: #fff;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+/* 20px window, rotated 10deg like the source; two stacked arrows slide
+ * through it on hover — the same flip family as the button labels. */
+.askIcon {
+  position: absolute;
+  top: 50%;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  transform: translateY(-50%) rotate(10deg);
+}
+
+.askIconTrack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.4s var(--flipEase);
+}
+
+.askIconTrack img {
+  display: block;
+  width: 19px;
+  height: 19px;
+  border-radius: 10px;
+  flex: none;
+}
+
+.askCeo:hover .askIconTrack,
+.askCeo:focus-visible .askIconTrack {
+  transform: translateY(-29px);
+}
+
+.askMeta {
+  color: #dbdbdb;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.askCeo:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* -------------------------------------------------------------- card stack */
+
+.sessions {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 16px; /* the source's Details column reserves this */
+}
+
+/* The stacking effect: each wrapper pins lower than the one before it. */
+.cardWrap {
+  position: sticky;
+  top: calc(var(--stick-base) + var(--i, 0) * var(--stick-step));
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--blush);
+}
+
+.cardAlt {
+  background: #fff;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--grey);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* Tiled dot pattern, 96px tile drawn at 24px (the source's 0.25 scale). */
+.cardTexture {
+  position: absolute;
+  inset: 0 0 -1px 0;
+  border-radius: 8px;
+  background: url("/numbers/texture-dots.svg") left top / 24px 24px repeat;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.cardTime {
+  margin: 0;
+  color: var(--red);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+}
+
+.topic {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardTitle {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-clash), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  font-size: 48px;
+  line-height: 52px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+}
+
+.cardCopy {
+  margin: 0;
+  color: var(--grey);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.cardMeta {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.cardFoot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardDivider {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--grey);
+}
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.star {
+  position: relative;
+  width: 15px;
+  height: 15px;
+}
+
+.star img {
+  position: absolute;
+  top: 6.25%;
+  right: 6.28%;
+  bottom: 9.38%;
+  left: 6.27%;
+  width: auto;
+  height: auto;
+}
+
+.trusted {
+  margin: 0;
+  color: var(--grey);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+/* ----------------------------------------------------------- enroll button */
+
+.enrollSlot {
+  display: inline-flex;
+}
+
+.enroll {
+  display: flex;
+  width: 120px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: var(--red);
+  color: var(--blush);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.enrollLabel {
+  position: relative;
+  width: 100px;
+  height: 22px;
+  overflow: hidden;
+}
+
+.enrollTrack {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s var(--flipEase);
+}
+
+.enrollTrack > span {
+  display: block;
+  height: 22px;
+  flex-shrink: 0;
+  line-height: 22px;
+}
+
+.enrollTrack > span:last-child {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.enroll:hover .enrollTrack,
+.enroll:focus-visible .enrollTrack {
+  transform: translateY(-22px);
+}
+
+.enroll:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------- entrance (appear) motion
+ *
+ * Transcribed from the source:
+ *
+ *   words    h2 at 50% in view: per word, blur 10px, opacity 0, y 10 -> clear,
+ *            spring(bounce 0, duration .4s), start .2s, stagger 50ms
+ *   subcopy  in-view: opacity fade, spring(bounce .2, duration .4s)
+ *   Ask CEO  in-view: opacity fade, same spring, delay .2s
+ *   card copy/meta   in-view: opacity fade, same spring
+ *   enroll slot      in-view: y 20 -> 0, tween .5s ease [.44,0,.56,1], delay 1.2s
+ *   enroll button    in-view: y 48 -> 0, spring(500/100/3), delay .3s
+ */
+
+.programs {
+  --flipEase: cubic-bezier(0.44, 0, 0.15, 1);
+  --tween: cubic-bezier(0.44, 0, 0.56, 1);
+  --wordSpring: linear(
+    0, 0.0499, 0.1594, 0.2883, 0.4152, 0.5299, 0.6282, 0.7098, 0.7758, 0.8283,
+    0.8694, 0.9013, 0.9258, 0.9445, 0.9586, 0.9693, 0.9772, 0.9832, 0.9876,
+    0.9909, 0.9933, 0.9951, 0.9964, 0.9974, 0.9981, 0.9986, 1
+  );
+  --fadeSpring: linear(
+    0, 0.0497, 0.1647, 0.3069, 0.4517, 0.5848, 0.6991, 0.7923, 0.8647, 0.9186,
+    0.9571, 0.9831, 0.9996, 1.0091, 1.0137, 1.0151, 1.0146, 1.0129, 1.0108,
+    1.0086, 1.0066, 1.0048, 1.0033, 1.0022, 1.0013, 1.0007, 1
+  );
+  --springB: linear(
+    0, 0.1059, 0.2818, 0.4434, 0.5743, 0.6761, 0.7541, 0.8135, 0.8586, 0.8929,
+    0.919, 0.9387, 0.9537, 0.9651, 0.9738, 0.9803, 0.9853, 0.9891, 0.992,
+    0.9941, 0.9958, 0.997, 0.998, 0.9987, 0.9993, 0.9997, 1
+  );
+}
+
+/* Word tokens: hidden until the h2 reports 50% in view, then each rises out
+ * of the blur on a 200ms start + 50ms-per-word stagger. */
+.word {
+  display: inline-block;
+  opacity: 0.001;
+  filter: blur(10px);
+  transform: translateY(10px);
+  will-change: transform, filter;
+}
+
+.heading[data-in="true"] .word {
+  animation: wordIn 400ms var(--wordSpring) both;
+  animation-delay: calc(200ms + var(--wd, 0ms));
+}
+
+@keyframes wordIn {
+  from {
+    opacity: 0.001;
+    filter: blur(10px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.subcopy,
+.cardCopy,
+.cardMeta,
+.askSlot {
+  opacity: 0.001;
+}
+
+.subcopy[data-in="true"],
+.cardCopy[data-in="true"],
+.cardMeta[data-in="true"] {
+  animation: fadeIn 400ms var(--fadeSpring) both;
+}
+
+.askSlot[data-in="true"] {
+  animation: fadeIn 400ms var(--fadeSpring) 200ms both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.001;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The enroll button rises on two stacked layers, like every primary button
+ * on the source: the slot tweens up 20px late (1.2s) while the button inside
+ * springs up 48px early (.3s). */
+.enrollSlot {
+  opacity: 0.001;
+  transform: translateY(20px);
+}
+
+.enrollSlot[data-in="true"] {
+  animation: slotIn 500ms var(--tween) 1200ms both;
+}
+
+@keyframes slotIn {
+  from {
+    opacity: 0.001;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.enroll {
+  opacity: 0.001;
+  transform: translateY(48px);
+}
+
+.enrollSlot[data-in="true"] .enroll {
+  animation: btnIn 1170ms var(--springB) 300ms both;
+}
+
+@keyframes btnIn {
+  from {
+    opacity: 0.001;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =============================================================== TABLET === */
+
+@media (max-width: 1199.98px) {
+  .programs {
+    gap: 80px;
+    padding-bottom: 80px;
+  }
+
+  .container {
+    width: 100%;
+    padding: 0 24px;
+  }
+
+  /* Heading column stops pinning and takes the source's 41% share. */
+  .headingCol {
+    position: relative;
+    top: 0;
+    flex: none;
+    width: calc((100% - 24px) * 0.41);
+  }
+
+  .heading {
+    font-size: 70px;
+    line-height: 70px;
+  }
+
+  .subcopy,
+  .cardCopy,
+  .trusted {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .cardMeta {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .cardTitle {
+    font-size: 38px;
+  }
+
+  .enroll {
+    height: 40px;
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .enrollLabel {
+    height: 20px;
+  }
+
+  .enrollTrack > span {
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .enroll:hover .enrollTrack,
+  .enroll:focus-visible .enrollTrack {
+    transform: translateY(-20px);
+  }
+}
+
+/* ================================================================ PHONE === */
+
+@media (max-width: 809.98px) {
+  .programs {
+    gap: 40px;
+    padding: 0;
+
+    --stick-base: 90px;
+    --stick-step: 50px;
+  }
+
+  .container {
+    flex-direction: column;
+    gap: 32px;
+    padding: 0 16px 40px;
+  }
+
+  .headingCol {
+    width: 100%;
+    gap: 24px;
+  }
+
+  .heading {
+    font-size: 48px;
+    line-height: 52.8px;
+    letter-spacing: -1px;
+  }
+
+  .sessions {
+    width: 100%;
+    gap: 16px;
+  }
+
+  .cardTitle {
+    font-size: 30px;
+    line-height: 32px;
+    letter-spacing: -0.4px;
+  }
+
+  .subcopy,
+  .cardCopy,
+  .cardMeta,
+  .trusted {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .enroll {
+    height: 40px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .enrollLabel {
+    height: 20px;
+  }
+
+  .enrollTrack > span {
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .enroll:hover .enrollTrack,
+  .enroll:focus-visible .enrollTrack {
+    transform: translateY(-20px);
+  }
+}
+
+/* ========================================================= reduced motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .word,
+  .subcopy,
+  .cardCopy,
+  .cardMeta,
+  .askSlot,
+  .enrollSlot,
+  .enroll {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none;
+  }
+
+  .enrollTrack,
+  .askIconTrack,
+  .askAvatar img {
+    transition: none;
+  }
+}

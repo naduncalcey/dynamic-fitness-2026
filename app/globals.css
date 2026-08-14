@@ -3,13 +3,27 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Brand theme */
+  --blush: #FFF7F7;
+  --blush-30: rgba(255, 230, 230, 0.3);
+  --red: #D72000;
+  --ink: #090909;
+  --ink-soft: #1e1e1e;
+  --grey: #5e5e5e;
+  --grey-60: rgba(94, 94, 94, 0.6);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-blush: var(--blush);
+  --color-red: var(--red);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-grey: var(--grey);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-clash);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +36,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }

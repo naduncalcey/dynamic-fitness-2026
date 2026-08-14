@@ -1,0 +1,491 @@
+/*
+ * About section — port of the Rep Republic "Experience Rep Republic" section.
+ *
+ * Breakpoints mirror the source exactly:
+ *   phone   0 – 809px
+ *   tablet  810 – 1199px
+ *   desktop 1200px +
+ *
+ * Base rules are the DESKTOP layout; the media queries at the bottom override
+ * down to tablet and phone. All motion values are transcribed from the
+ * source's own config (its `framer/appear` JSON and page-chunk effect
+ * definitions) — see the entrance-motion block for the numbers.
+ */
+
+/* Theme colours (--blush, --red, --ink, …) come from app/globals.css. */
+
+.about {
+  /* Rides over the sticky hero as the page scrolls (source: z-index 5). */
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 120px;
+  padding: 0 0 80px;
+  background: var(--blush);
+
+  font-family: var(--font-inter), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss07", "ss08", "salt";
+  font-variation-settings: "opsz" 32;
+}
+
+/* ---------------------------------------------------------- heading icons */
+
+/* Icon glyphs are inset inside their boxes as in the design. */
+.blockIcon img {
+  position: absolute;
+  width: auto;
+  height: auto;
+}
+
+.icoDumbbellHead img {
+  top: 17.19%;
+  right: 0;
+  bottom: 17.19%;
+  left: 0;
+}
+
+.icoTarget img {
+  top: 7.78%;
+  right: 7.79%;
+  bottom: 7.78%;
+  left: 7.76%;
+}
+
+/* ------------------------------------------------------------------ layout */
+
+.container {
+  width: 1120px;
+  max-width: 100%;
+}
+
+.row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.content {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ----------------------------------------------------------------- heading */
+
+.heading {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-clash), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  font-size: 88px;
+  line-height: 88px;
+  font-weight: 600;
+  letter-spacing: -3px;
+}
+
+.hRed {
+  color: var(--red);
+}
+
+/* ------------------------------------------------------------------ blocks */
+
+.blocks {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.divider {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--grey-60);
+}
+
+.block {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blockHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.blockIcon {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+
+.blockTitle {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-clash), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+  letter-spacing: -1px;
+}
+
+.blockCopy {
+  margin: 0;
+  color: var(--grey);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+/* ------------------------------------------------------------------ button */
+
+.btnSlot {
+  display: inline-flex;
+}
+
+.btn {
+  display: flex;
+  width: 140px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: var(--red);
+  color: var(--blush);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Clipped window exactly one line tall — the label track slides through it,
+ * exactly as the hero buttons do. */
+.btnLabel {
+  position: relative;
+  width: 100px;
+  height: 22px;
+  overflow: hidden;
+}
+
+.btnTrack {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.44, 0, 0.15, 1);
+}
+
+.btnTrack > span {
+  display: block;
+  height: 22px;
+  flex-shrink: 0;
+  line-height: 22px;
+}
+
+.btnTrack > span:last-child {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn:hover .btnTrack,
+.btn:focus-visible .btnTrack {
+  transform: translateY(-22px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------- video */
+
+.videoCol {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 620px;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--grey);
+}
+
+/* ------------------------------------------------- entrance (appear) motion
+ *
+ * Transcribed from the source:
+ *
+ *   row      in-view (any pixel, once): opacity 0, y 30, scale .9 -> identity,
+ *            spring(bounce .2, duration 1.5s), delay .3s
+ *   words    h2 at 50% in view: per word, blur 10px, opacity 0, y 10 -> clear,
+ *            spring(bounce 0, duration .4s), start .2s, stagger 50ms.
+ *            Block titles ("Who We Are") run the same with a .5s start.
+ *   copy     in-view: opacity fade, spring(bounce .2, duration .4s)
+ *   button   in-view: y 48 -> 0, spring(stiffness 500, damping 100, mass 3),
+ *            delay .3s — the same spring as the hero buttons
+ *
+ * The springs are expressed as exact ODE solutions sampled into `linear()`.
+ * The duration-based ones use framer-motion's mapping (residual 0.1% at the
+ * stated duration): bounce .2 -> zeta .8, bounce 0 -> critically damped.
+ */
+
+.about {
+  --rowSpring: linear(
+    0, 0.0497, 0.1647, 0.3069, 0.4517, 0.5848, 0.6991, 0.7923, 0.8647, 0.9186,
+    0.9571, 0.9831, 0.9996, 1.0091, 1.0137, 1.0151, 1.0146, 1.0129, 1.0108,
+    1.0086, 1.0066, 1.0048, 1.0033, 1.0022, 1.0013, 1.0007, 1
+  );
+  --wordSpring: linear(
+    0, 0.0499, 0.1594, 0.2883, 0.4152, 0.5299, 0.6282, 0.7098, 0.7758, 0.8283,
+    0.8694, 0.9013, 0.9258, 0.9445, 0.9586, 0.9693, 0.9772, 0.9832, 0.9876,
+    0.9909, 0.9933, 0.9951, 0.9964, 0.9974, 0.9981, 0.9986, 1
+  );
+  --fadeSpring: linear(
+    0, 0.0497, 0.1647, 0.3069, 0.4517, 0.5848, 0.6991, 0.7923, 0.8647, 0.9186,
+    0.9571, 0.9831, 0.9996, 1.0091, 1.0137, 1.0151, 1.0146, 1.0129, 1.0108,
+    1.0086, 1.0066, 1.0048, 1.0033, 1.0022, 1.0013, 1.0007, 1
+  );
+  --springB: linear(
+    0, 0.1059, 0.2818, 0.4434, 0.5743, 0.6761, 0.7541, 0.8135, 0.8586, 0.8929,
+    0.919, 0.9387, 0.9537, 0.9651, 0.9738, 0.9803, 0.9853, 0.9891, 0.992,
+    0.9941, 0.9958, 0.997, 0.998, 0.9987, 0.9993, 0.9997, 1
+  );
+}
+
+.row {
+  opacity: 0.001;
+  transform: translateY(30px) scale(0.9);
+  will-change: transform;
+}
+
+.row[data-in="true"] {
+  animation: rowIn 1500ms var(--rowSpring) 300ms both;
+}
+
+@keyframes rowIn {
+  from {
+    opacity: 0.001;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Word tokens: hidden until their heading reports in-view, then each rises
+ * out of the blur on its own delay: --wbase (200ms h2 / 500ms blocks) plus a
+ * 50ms-per-word stagger carried by --wd. */
+.word {
+  display: inline-block;
+  opacity: 0.001;
+  filter: blur(10px);
+  transform: translateY(10px);
+  will-change: transform, filter;
+}
+
+.heading {
+  --wbase: 200ms;
+}
+
+.heading[data-in="true"] .word,
+.blockHead[data-in="true"] .word {
+  animation: wordIn 400ms var(--wordSpring) both;
+  animation-delay: calc(var(--wbase, 200ms) + var(--wd, 0ms));
+}
+
+@keyframes wordIn {
+  from {
+    opacity: 0.001;
+    filter: blur(10px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.blockCopy {
+  opacity: 0.001;
+}
+
+.blockCopy[data-in="true"] {
+  animation: fadeIn 400ms var(--fadeSpring) both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.001;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.btnSlot {
+  opacity: 0.001;
+  transform: translateY(48px);
+}
+
+.btnSlot[data-in="true"] {
+  animation: btnIn 1170ms var(--springB) 300ms both;
+}
+
+@keyframes btnIn {
+  from {
+    opacity: 0.001;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =============================================================== TABLET === */
+
+@media (max-width: 1199.98px) and (min-width: 810px) {
+  .about {
+    gap: 80px;
+  }
+
+  .container {
+    width: 100%;
+    padding: 0 24px;
+  }
+
+  .heading {
+    font-size: 70px;
+    line-height: 70px;
+  }
+
+  .blockTitle {
+    font-size: 26px;
+    line-height: 32px;
+  }
+
+  .blockCopy {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .btn {
+    height: 40px;
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .btnLabel {
+    height: 20px;
+  }
+
+  .btnTrack > span {
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .btn:hover .btnTrack,
+  .btn:focus-visible .btnTrack {
+    transform: translateY(-20px);
+  }
+}
+
+/* ================================================================ PHONE === */
+
+@media (max-width: 809.98px) {
+  .about {
+    gap: 0;
+    padding: 0;
+  }
+
+  .container {
+    padding: 40px 16px;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .heading {
+    font-size: 48px;
+    line-height: 52.8px;
+    letter-spacing: -1px;
+  }
+
+  .blockTitle {
+    font-size: 24px;
+    line-height: 20px;
+  }
+
+  .blockCopy {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .btnSlot,
+  .btn {
+    width: 100%;
+  }
+
+  .btn {
+    height: 40px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .btnLabel {
+    height: 20px;
+  }
+
+  .btnTrack > span {
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .btn:hover .btnTrack,
+  .btn:focus-visible .btnTrack {
+    transform: translateY(-20px);
+  }
+
+  .videoCol {
+    width: 100%;
+    flex: none;
+    height: 600px;
+  }
+}
+
+/* ========================================================= reduced motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .word,
+  .blockCopy,
+  .btnSlot {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none;
+  }
+
+  .btnTrack {
+    transition: none;
+  }
+}

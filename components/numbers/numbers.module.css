@@ -1,0 +1,181 @@
+/*
+ * Numbers carousel — port of the Rep Republic stats ticker.
+ *
+ * Six 268x180 items (three counter cards, three photos) marquee leftwards at
+ * 50px/s between two full-width hairlines. Hover slows the loop to 0.6x and
+ * the strip pauses off screen, both handled in Numbers.tsx via the same WAAPI
+ * animation the source builds. Visible from 768px up; hidden below.
+ *
+ * Theme colours (--blush, --ink, …) come from app/globals.css.
+ */
+
+.numbers {
+  /* Rides over the sticky hero like every section after it (source: z 3). */
+  position: relative;
+  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 120px;
+  background: var(--blush);
+
+  font-family: var(--font-inter), sans-serif;
+  font-variation-settings: "opsz" 32;
+}
+
+.viewport {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid rgba(94, 94, 94, 0.65);
+  border-bottom: 1px solid rgba(94, 94, 94, 0.65);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.set,
+.pair {
+  display: flex;
+}
+
+/* ---------------------------------------------------------------- stat card */
+
+.stat {
+  position: relative;
+  display: flex;
+  width: 268px;
+  height: 180px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: var(--blush);
+}
+
+/* Tiled dot pattern, 96px tile drawn at 24px (the source's 0.25 scale). */
+.statTexture {
+  position: absolute;
+  inset: 0 0 -1px 0;
+  border-radius: 8px;
+  background: url("/numbers/texture-dots.svg") left top / 24px 24px repeat;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Hairline on the card's right edge only — photos have none. */
+.statLine {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  width: 1px;
+  height: 180px;
+  background: var(--grey);
+  opacity: 0.65;
+}
+
+/* Ghost copy of the final value reserves the box; the counting copy sits on
+ * top of it, so the card never resizes mid-count. */
+.statNum {
+  position: relative;
+}
+
+.statNumGhost,
+.statNumLive {
+  display: block;
+  margin: 0;
+  color: var(--ink);
+  font-size: 62px;
+  line-height: 72px;
+  font-weight: 600;
+  font-feature-settings: "ss01", "ss02";
+  letter-spacing: -2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.statNumGhost {
+  opacity: 0;
+}
+
+.statNumLive {
+  position: absolute;
+  inset: 0;
+}
+
+.statLabel {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss07", "ss08", "salt";
+  letter-spacing: -0.1px;
+  text-align: center;
+
+  /* Fades in on view: source appear config spring(bounce .2, duration .4). */
+  opacity: 0.001;
+}
+
+.numbers[data-in="true"] .statLabel {
+  animation: labelIn 400ms
+    linear(
+      0, 0.0497, 0.1647, 0.3069, 0.4517, 0.5848, 0.6991, 0.7923, 0.8647,
+      0.9186, 0.9571, 0.9831, 0.9996, 1.0091, 1.0137, 1.0151, 1.0146, 1.0129,
+      1.0108, 1.0086, 1.0066, 1.0048, 1.0033, 1.0022, 1.0013, 1.0007, 1
+    )
+    both;
+}
+
+@keyframes labelIn {
+  from {
+    opacity: 0.001;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------------- photos */
+
+.photo {
+  position: relative;
+  width: 268px;
+  height: 180px;
+  overflow: hidden;
+}
+
+.photo img {
+  object-fit: cover;
+}
+
+/* =============================================================== TABLET === */
+
+@media (max-width: 1199.98px) {
+  .statLabel {
+    font-size: 15px;
+    line-height: 20px;
+  }
+}
+
+/* ======================================================== hidden on phone === */
+
+@media (max-width: 767.98px) {
+  .numbers {
+    display: none;
+  }
+}
+
+/* ========================================================= reduced motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .statLabel {
+    opacity: 1;
+    animation: none;
+  }
+}

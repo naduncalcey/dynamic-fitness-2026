@@ -1,0 +1,400 @@
+/*
+ * Testimonials section — port of the Rep Republic "Members' Words" section.
+ *
+ * Breakpoints mirror the source exactly:
+ *   phone   0 – 809px      rows stack (gap 30), cards full width
+ *   tablet  810 – 1199px   pair rows space-between, cards 350, wrap gap 140
+ *   desktop 1200px +       pair rows centered with 420 gap, cards 370,
+ *                          wrap gap 180, offset cards drop 140
+ *
+ * Mechanism, read from the live DOM: the heading block sits in a 100vh
+ * sticky layer (z 1) that pins to the viewport top; the card rows (z 2)
+ * scroll over it, and their container's gradient (transparent 40% -> blush
+ * 66%) wipes the heading away as the stack passes.
+ *
+ * Theme colours (--blush, --red, --ink, …) come from app/globals.css.
+ */
+
+.testimonials {
+  /* Over the pinned boxer banner (source: z-index 4). */
+  position: relative;
+  z-index: 4;
+
+  background: var(--blush);
+
+  font-family: var(--font-inter), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss07", "ss08", "salt";
+  font-variation-settings: "opsz" 32;
+
+  --fadeSpring: linear(
+    0, 0.0497, 0.1647, 0.3069, 0.4517, 0.5848, 0.6991, 0.7923, 0.8647, 0.9186,
+    0.9571, 0.9831, 0.9996, 1.0091, 1.0137, 1.0151, 1.0146, 1.0129, 1.0108,
+    1.0086, 1.0066, 1.0048, 1.0033, 1.0022, 1.0013, 1.0007, 1
+  );
+}
+
+/* ---------------------------------------------------------- sticky heading */
+
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  height: 100vh;
+  height: 100svh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.headingBlock {
+  display: flex;
+  max-width: 1000px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tabIcon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.tabIcon img {
+  position: absolute;
+  top: 15.63%;
+  right: 6.25%;
+  bottom: 9.39%;
+  left: 6.25%;
+  width: auto;
+  height: auto;
+}
+
+.tabText {
+  margin: 0;
+  color: var(--red);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.heading {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-clash), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  font-size: 88px;
+  line-height: 88px;
+  font-weight: 600;
+  letter-spacing: -3px;
+}
+
+.subcopy {
+  margin: 0;
+  color: var(--grey);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  opacity: 0.001;
+}
+
+.subcopy[data-in="true"] {
+  animation: fadeIn 400ms var(--fadeSpring) both;
+}
+
+/* -------------------------------------------------------------- card rows */
+
+/* Scrolls over the pinned heading; the gradient wipes the heading away. */
+.cards {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 180px;
+  background: linear-gradient(
+    rgba(255, 247, 247, 0) 40%,
+    var(--blush) 66%
+  );
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 420px;
+  padding: 0 24px;
+}
+
+.rowSingle {
+  justify-content: center;
+}
+
+.offset {
+  padding-top: 140px;
+}
+
+.spacer {
+  width: 100%;
+  height: 32px;
+}
+
+/* -------------------------------------------------------------------- card */
+
+.card {
+  position: relative;
+  display: flex;
+  width: 370px;
+  height: 402px;
+  flex: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cardBg {
+  position: absolute;
+  inset: 0;
+}
+
+.cardBg img {
+  object-fit: cover;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(48, 15, 3, 0.35);
+}
+
+.cardTop {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quoteIcon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.quoteIcon img {
+  position: absolute;
+  top: 21.88%;
+  right: 9.38%;
+  bottom: 18.75%;
+  left: 9.38%;
+  width: auto;
+  height: auto;
+}
+
+.quote {
+  margin: 0;
+  color: var(--blush);
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  margin: 0;
+  color: var(--blush);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.cardBottom {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cardLine {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 247, 247, 0.35);
+}
+
+.progRow {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkIcon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.checkIcon img {
+  position: absolute;
+  inset: 6.25%;
+  width: auto;
+  height: auto;
+}
+
+.program {
+  margin: 0;
+  color: var(--blush);
+  font-size: 14px;
+  line-height: 22.4px;
+  font-weight: 400;
+  letter-spacing: -0.28px;
+  white-space: pre;
+}
+
+/* Text fades: the source fades quote/name/location/program and the subcopy
+ * on spring(bounce .2, duration .4s) as each enters view. */
+.quote,
+.name,
+.program {
+  opacity: 0.001;
+}
+
+.quote[data-in="true"],
+.name[data-in="true"],
+.program[data-in="true"] {
+  animation: fadeIn 400ms var(--fadeSpring) both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.001;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* =============================================================== TABLET === */
+
+@media (max-width: 1199.98px) {
+  .heading {
+    font-size: 70px;
+    line-height: 70px;
+  }
+
+  .tabText,
+  .subcopy {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .cards {
+    gap: 140px;
+  }
+
+  .row {
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .rowSingle {
+    justify-content: center;
+  }
+
+  .card {
+    width: 350px;
+  }
+
+  .name {
+    font-size: 15px;
+    line-height: 20px;
+  }
+}
+
+/* ================================================================ PHONE === */
+
+@media (max-width: 809.98px) {
+  .heading {
+    font-size: 48px;
+    line-height: 52.8px;
+    letter-spacing: -1px;
+  }
+
+  .tabText,
+  .subcopy {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .cards {
+    gap: 30px;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 0 16px;
+  }
+
+  .rowSingle {
+    padding: 0 20px;
+  }
+
+  .rowLast {
+    padding: 0 20px 40px;
+  }
+
+  .offset {
+    padding-top: 0;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  .name {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+/* ========================================================= reduced motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .subcopy,
+  .quote,
+  .name,
+  .program {
+    opacity: 1;
+    animation: none;
+  }
+}

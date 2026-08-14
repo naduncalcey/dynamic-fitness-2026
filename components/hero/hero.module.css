@@ -1,0 +1,912 @@
+/*
+ * Hero section — port of the Rep Republic hero.
+ *
+ * Breakpoints mirror the source exactly:
+ *   phone   0 – 809px
+ *   tablet  810 – 1199px
+ *   desktop 1200px +
+ *
+ * Base rules below are the DESKTOP layout; the two media queries at the
+ * bottom override down to tablet and phone.
+ */
+
+/* Theme colours (--blush, --red, --ink, …) come from app/globals.css. */
+
+.hero {
+  /* Height the hero spends on everything that is NOT the wordmark. The
+   * wordmark's width cap is derived from it, so each breakpoint restates it. */
+  --reserved: 596px;
+
+  /* Sizing unit for all supporting UI. Fixed at 16px up to 1440px wide — so
+   * every measured value below is unchanged — then grows to 26px by 3840 so a
+   * 4K display doesn't get a giant wordmark beside miniature everything-else. */
+  --u: clamp(16px, calc(16px + (100vw - 1440px) * 0.00417), 26px);
+
+  /* Pinned under the rest of the page: the hero sticks to the viewport top
+   * and the sections after it (higher z-index) scroll up over it, exactly as
+   * the source pins its hero. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  overflow: hidden;
+  /* min-height, not height: on a viewport too short to hold the content (a
+   * landscape phone) the hero grows and scrolls instead of clipping it. */
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 60px; /* blush band the header sits in */
+  background: var(--blush);
+  isolation: isolate;
+
+  font-family: var(--font-inter), sans-serif;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss07", "ss08", "salt";
+  font-variation-settings: "opsz" 32;
+}
+
+/* Clips the backdrop against the blush band. Grows with its content. */
+.frame {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- backdrop */
+
+.backdrop {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  /* 100svh normally; 100% keeps it covering once the frame outgrows the
+   * viewport on very short windows. */
+  height: max(100vh, 100%);
+  height: max(100svh, 100%);
+}
+
+.backdrop img {
+  object-fit: cover;
+  object-position: 50% 0%;
+}
+
+/* ----------------------------------------------------------------- content */
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--u) * 1.75) 0 calc(var(--u) * 2.5);
+}
+
+/* ---------------------------------------------------------------- wordmark */
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(var(--u) * 0.25);
+  padding: 0 calc(var(--u) * 1.5);
+}
+
+.wordmark {
+  width: 100%;
+  margin: 0;
+}
+
+/* The wordmark is two staggered lines: DYNAMIC flush left, FITNESS(R) flush
+ * right, both at one size — the diagonal comes from the words' own widths.
+ *
+ * Each viewBox is a design canvas measured in the same units as the type
+ * (font-size 100), so scaling the SVG to the column scales the whole
+ * composition. Measured widths at font-size 100: DYNAMIC 444.19,
+ * FITNESS(R) 430.02, the two set on one line 888.58.
+ *
+ *   wide canvas  888.58 x 85  -> one line, spans the column edge to edge
+ *   phone canvas 444.19 x 156 -> two lines, each spanning the column
+ *
+ * Wide is one line on purpose. A line's rendered width is D * B / H, where B
+ * is the height the wordmark gets and H the canvas height — the canvas width
+ * cancels out, so height is the only lever. On a 1667x804 laptop the wordmark
+ * gets 284px; two lines spanning that column would need 578px. One line needs
+ * 155px and lands at the same 182px font size, because a single line's size is
+ * set by the column rather than by the height left over.
+ *
+ * `width` is additionally capped against viewport height: the rest of the hero
+ * is a fixed 596px tall on desktop, so on a very short window the wordmark
+ * scales down rather than pushing the buttons out of a 100vh section. */
+.wordmark svg {
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+
+/* The max() floor matters: without it a viewport shorter than --reserved makes
+ * the calc go negative, CSS clamps the width to 0 and the wordmark vanishes
+ * outright (landscape phones, very short desktop windows). */
+.wmWide {
+  width: min(100%, max(45%, calc((100svh - var(--reserved)) * 10.4538)));
+}
+
+.wmPhone {
+  width: min(100%, max(60%, calc((100svh - var(--reserved)) * 2.8474)));
+}
+
+/* Only one variant is ever displayed. Scoped under .wordmark so these
+ * out-rank the `.wordmark svg` rule above. */
+.wordmark .wmPhone {
+  display: none;
+}
+
+.wmLines {
+  display: flex;
+  flex-direction: column;
+}
+
+.wmLine {
+  margin: 0;
+  color: var(--blush);
+  font-family: var(--font-clash), sans-serif;
+  font-size: 100px;
+  line-height: 78px; /* tight stacking for the phone's two lines */
+  font-weight: 700;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  letter-spacing: -0.65274px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Wide is a single line, so it gets a little more room around the caps. */
+.wmWide .wmLine {
+  line-height: 85px;
+}
+
+/* Second line is pushed to the right edge of the canvas. */
+.wmLineEnd {
+  text-align: right;
+}
+
+/* The registered-trademark glyph is a lighter weight and the accent colour. */
+.wmR {
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ meta rows */
+
+.metaRow {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(var(--u) * 0.25);
+  color: var(--blush);
+  font-size: var(--u);
+  line-height: 1.375;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+/* The second row carries the gap down to the CEO card. Back to the source's
+ * 100px now that a single-line wordmark no longer needs the height. */
+.metaRowLast {
+  padding-bottom: calc(var(--u) * 6.25);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 0.625);
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 0.3125);
+}
+
+/* 15×15 icon box; the exported glyph is inset inside it, as in the design.
+ * The 3px bottom margin reproduces the design's 15/18 box, which rides the
+ * star 1.5px above the text row's centre line. */
+.starBox {
+  position: relative;
+  display: block;
+  width: calc(var(--u) * 0.9375);
+  height: calc(var(--u) * 0.9375);
+  margin-bottom: calc(var(--u) * 0.1875);
+}
+
+.starBox img {
+  position: absolute;
+  top: 6.25%;
+  right: 6.28%;
+  bottom: 9.38%;
+  left: 6.27%;
+  width: auto;
+  height: auto;
+}
+
+.metaRow span:last-child {
+  text-align: right;
+}
+
+/* -------------------------------------------------------------- talk to CEO */
+
+/* Everything inside the card is in `em`, so the whole card scales as one unit
+ * from its own font-size — the absolutely-positioned badge included. */
+.ceoCard {
+  display: flex;
+  width: 16em;
+  align-items: center;
+  gap: 0.625em;
+  padding: 0.5em;
+  border-radius: 0.3125em;
+  background: #fff;
+  font-size: var(--u);
+  text-decoration: none;
+}
+
+.ceoAvatar {
+  position: relative;
+  width: 4em;
+  height: 4em;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 0.15625em;
+  background: var(--ink);
+}
+
+.ceoAvatar img {
+  object-fit: cover;
+  object-position: 50% 100%;
+}
+
+.ceoBody {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.ceoTitleRow {
+  position: relative;
+  height: 1.4375em;
+}
+
+.ceoTitle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  max-width: 7.5em;
+  transform: translateY(-50%);
+  color: var(--ink);
+  font-size: 1em;
+  line-height: 1.375;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+.ceoBadge {
+  position: absolute;
+  top: 50%;
+  left: 9.15625em;
+  width: 1.1875em;
+  height: 1.1875em;
+  transform: translateY(-50%) rotate(10deg);
+}
+
+.ceoMeta {
+  color: var(--ink-soft);
+  font-size: 0.75em;
+  line-height: 1.3333;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+
+/* -------------------------------------------------------------------- body */
+
+.body {
+  display: flex;
+  width: calc(var(--u) * 29.375);
+  max-width: 960px;
+  flex-direction: column;
+  gap: calc(var(--u) * 1.4375);
+  padding-left: calc(var(--u) * 1.75);
+}
+
+.tagline {
+  margin: 0;
+  color: var(--blush);
+  font-family: var(--font-clash), sans-serif;
+  font-size: calc(var(--u) * 1.75);
+  line-height: 1.2143;
+  font-weight: 600;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss08", "salt";
+  letter-spacing: -1px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 0.75);
+  padding-top: calc(var(--u) * 0.3125);
+}
+
+/* ----------------------------------------------------------------- buttons */
+
+/* Wrapper carrying the outer tween so the button's spring can stack on top. */
+.btnSlot {
+  display: inline-flex;
+}
+
+.btn {
+  position: relative;
+  display: flex;
+  height: calc(var(--u) * 2.75);
+  align-items: center;
+  justify-content: center;
+  padding: 0 calc(var(--u) * 1.25);
+  border-radius: calc(var(--u) * 0.5);
+  color: var(--blush);
+  font-size: var(--u);
+  line-height: 1.375;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btnPrimary {
+  width: calc(var(--u) * 8.75);
+  background: var(--red);
+}
+
+.btnSecondary {
+  width: calc(var(--u) * 10.75);
+  border: 1px solid var(--blush);
+  background: transparent;
+}
+
+/* Clipped window exactly one line tall — the label track slides through it. */
+.btnLabel {
+  position: relative;
+  width: calc(var(--u) * 6.25);
+  height: calc(var(--u) * 1.375);
+  overflow: hidden;
+}
+
+.btnTrack {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.44, 0, 0.15, 1);
+}
+
+.btnTrack > span {
+  display: block;
+  height: calc(var(--u) * 1.375);
+  flex-shrink: 0;
+  line-height: calc(var(--u) * 1.375);
+}
+
+/* Incoming copy is underlined, as on the source. */
+.btnTrack > span:last-child {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn:hover .btnTrack,
+.btn:focus-visible .btnTrack {
+  transform: translateY(calc(var(--u) * -1.375));
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--blush);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------ scroll arrow */
+
+.scrollCue {
+  display: block;
+  width: calc(var(--u) * 1.9375);
+  height: calc(var(--u) * 1.875);
+  margin-top: calc(var(--u) * 0.3125);
+}
+
+/* The idle bob lives on an inner element so it multiplies with the entrance
+ * spring on .scrollCue instead of overwriting its transform.
+ *
+ * Sampled off the running source: a 5px rise, half-period 608.4ms measured
+ * across 14 consecutive turning points (+/-1ms), so a 1217ms round trip. The
+ * curve below is the measured motion itself, resampled to 24 stops — it eases
+ * out and visibly plateaus around 90%, because the source drives this with a
+ * spring that gets cut off and reversed before it finishes settling. */
+.scrollCueInner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: arrowBob 1217ms var(--bobEase) infinite;
+}
+
+.scrollCueInner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes arrowBob {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--u) * -0.3125));
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* -------------------------------------------------- decorative plus marks */
+
+.detail {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 90px;
+  pointer-events: none;
+}
+
+.plus,
+.plusSpacer {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.plus::before,
+.plus::after {
+  content: "";
+  position: absolute;
+  background: var(--blush-30);
+  mix-blend-mode: difference;
+}
+
+.plus::before {
+  top: 0;
+  left: 7px;
+  width: 2px;
+  height: 16px;
+}
+
+.plus::after {
+  top: 7px;
+  left: 0;
+  width: 16px;
+  height: 2px;
+}
+
+.detail1 {
+  top: 385px;
+  left: 341px;
+}
+
+/* The -50% centring offset is carried by the rise keyframe's --fromX. */
+.detail2 {
+  bottom: 203px;
+  left: 50%;
+}
+
+.detail3 {
+  top: 405px;
+  right: 380px;
+}
+
+/* ------------------------------------------------- entrance (appear) motion
+ *
+ * Every value below is transcribed from the source's own appear-animation
+ * config (its `framer/appear` JSON) — initial offsets, delays, durations and
+ * spring constants. The springs are all overdamped (no overshoot), so each is
+ * expressed as the exact solution of its spring ODE sampled into `linear()`:
+ *
+ *   spring A  stiffness 300  damping 60   mass 1  -> zeta 1.732, settles 1275ms
+ *   spring B  stiffness 500  damping 100  mass 3  -> zeta 1.291, settles 1170ms
+ *   spring C  stiffness 200  damping 70   mass 1  -> zeta 2.475, settles 2330ms
+ *
+ * The backdrop zoom is not in that config (it mounts with React), so its curve
+ * was sampled off the running page and fitted: a clean exponential ease-out,
+ * tau = 282ms, settling at 1500ms.
+ */
+
+.hero {
+  --tween: cubic-bezier(0.44, 0, 0.56, 1);
+  --springA: linear(
+    0, 0.1587, 0.3526, 0.5056, 0.6228, 0.7123, 0.7806, 0.8327, 0.8725, 0.9029,
+    0.9261, 0.9438, 0.9574, 0.9677, 0.9756, 0.9816, 0.9862, 0.9897, 0.9924,
+    0.9944, 0.996, 0.9972, 0.9981, 0.9988, 0.9993, 0.9997, 1
+  );
+  --springB: linear(
+    0, 0.1059, 0.2818, 0.4434, 0.5743, 0.6761, 0.7541, 0.8135, 0.8586, 0.8929,
+    0.919, 0.9387, 0.9537, 0.9651, 0.9738, 0.9803, 0.9853, 0.9891, 0.992,
+    0.9941, 0.9958, 0.997, 0.998, 0.9987, 0.9993, 0.9997, 1
+  );
+  --springC: linear(
+    0, 0.1993, 0.3874, 0.5314, 0.6416, 0.7259, 0.7905, 0.8399, 0.8777, 0.9066,
+    0.9288, 0.9457, 0.9587, 0.9686, 0.9762, 0.982, 0.9865, 0.9899, 0.9925,
+    0.9945, 0.996, 0.9972, 0.9981, 0.9988, 0.9993, 0.9997, 1
+  );
+  --bobEase: linear(
+    0, 0.0189, 0.0378, 0.0909, 0.1742, 0.2577, 0.334, 0.4034, 0.4668, 0.5236,
+    0.5727, 0.6175, 0.6586, 0.6946, 0.726, 0.7546, 0.7804, 0.8037, 0.8243,
+    0.8426, 0.8592, 0.8741, 0.8874, 0.8991, 1
+  );
+  --zoomEase: linear(
+    0, 0.1859, 0.3374, 0.4609, 0.5616, 0.6436, 0.7105, 0.7649, 0.8093, 0.8455,
+    0.875, 0.899, 0.9186, 0.9346, 0.9476, 0.9582, 0.9669, 0.9739, 0.9796,
+    0.9843, 0.9881, 0.9912, 0.9938, 0.9958, 0.9975, 0.9989, 1
+  );
+}
+
+/* Shared rise: each element supplies its own --fromY (and --fromX). */
+@keyframes rise {
+  from {
+    opacity: 0.001;
+    transform: translateX(var(--fromX, 0)) translateY(var(--fromY));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(var(--fromX, 0)) translateY(0);
+  }
+}
+
+/* Backdrop pushes down and scales up, then settles — the zoom-out. */
+@keyframes zoomOut {
+  from {
+    transform: translateY(70px) scale(1.2);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.backdrop {
+  animation: zoomOut 1500ms var(--zoomEase) both;
+}
+
+/* Wide rises as one block, matching how the source animates its wordmark. */
+.wmWide {
+  --fromY: -120px;
+  animation: rise 1275ms var(--springA) both;
+}
+
+/* Phone staggers the two lines, as the source's phone wordmark does. These
+ * offsets are in canvas units, so they scale with the SVG — 154 and 71 land
+ * at the source's -130px and -60px once scaled to a 390px-wide screen. */
+.wmPhoneL1 {
+  --fromY: -154px;
+  animation: rise 1275ms var(--springA) 100ms both;
+}
+
+.wmPhoneL2 {
+  --fromY: -71px;
+  animation: rise 600ms var(--tween) 300ms both;
+}
+
+.aMeta1 {
+  --fromY: 20px;
+  animation: rise 500ms var(--tween) 200ms both;
+}
+
+.aMeta2 {
+  --fromY: 20px;
+  animation: rise 500ms var(--tween) 300ms both;
+}
+
+.aCard {
+  --fromY: 20px;
+  animation: rise 500ms var(--tween) 450ms both;
+}
+
+.aTagline {
+  --fromY: 20px;
+  animation: rise 500ms var(--tween) 300ms both;
+}
+
+/* The button containers rise on a tween while the button inside springs up —
+ * two stacked animations, exactly as the source layers them. */
+.aBtn1 {
+  --fromY: 20px;
+  animation: rise 500ms var(--tween) 500ms both;
+}
+
+.aBtn2 {
+  --fromY: 20px;
+  animation: rise 500ms var(--tween) 700ms both;
+}
+
+.aBtnInner {
+  --fromY: 48px;
+  animation: rise 1170ms var(--springB) 300ms both;
+}
+
+.aArrow {
+  --fromY: -40px;
+  animation: rise 2330ms var(--springC) 800ms both;
+}
+
+.detail1 {
+  --fromY: 100px;
+  animation: rise 1275ms var(--springA) 800ms both;
+}
+
+.detail2 {
+  --fromX: -50%;
+  --fromY: -100px;
+  animation: rise 1275ms var(--springA) 800ms both;
+}
+
+.detail3 {
+  --fromY: 100px;
+  animation: rise 1275ms var(--springA) 800ms both;
+}
+
+/* =============================================================== TABLET === */
+
+@media (max-width: 1199.98px) and (min-width: 810px) {
+  /* Tablet's fixed furniture is 608px tall rather than 596px. */
+  .hero {
+    --reserved: 608px;
+  }
+
+  .content {
+    padding-top: 50px;
+  }
+
+  .metaRow {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .ceoTitle {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .tagline {
+    font-size: 26px;
+    line-height: 32px;
+  }
+
+  .btn {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .btnLabel {
+    height: 20px;
+  }
+
+  .btnTrack > span {
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .btn:hover .btnTrack,
+  .btn:focus-visible .btnTrack {
+    transform: translateY(-20px);
+  }
+
+  .detail1 {
+    display: none;
+  }
+
+  /* Tablet anchors detail 2 from the right, so it loses the centring offset. */
+  .detail2 {
+    left: auto;
+    right: 279px;
+    --fromX: 0;
+  }
+
+  .detail3 {
+    right: 43px;
+  }
+}
+
+/* ================================================================ PHONE === */
+
+@media (max-width: 809.98px) {
+  .hero {
+    --reserved: 378px;
+    padding-top: 0;
+  }
+
+  .backdrop {
+    bottom: -44px;
+  }
+
+  .backdrop img {
+    object-position: 49.2% 100%;
+  }
+
+  .content {
+    padding: 80px 0 16px;
+  }
+
+  .heading {
+    padding: 0 8px;
+  }
+
+  .metaRow {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  /* No CEO card on phone, so no gap to reserve. */
+  .metaRowLast {
+    padding-bottom: 0;
+  }
+
+  .ceoCard {
+    display: none;
+  }
+
+  .body {
+    width: 100%;
+    align-items: center;
+    gap: 11.5px;
+    padding: 0 16px;
+  }
+
+  /* Phone drops the display face for the body copy. The narrow measure
+   * reproduces the source's hard line breaks (…more / than a gym… / coaching…)
+   * while staying centred in the full-width column. */
+  .tagline {
+    max-width: 228px;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
+    text-align: center;
+  }
+
+  .actions {
+    width: 100%;
+    flex-direction: column;
+    padding-top: 4.5px;
+  }
+
+  .btn {
+    width: 100%;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .btnSlot,
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+  }
+
+  .btnLabel {
+    height: 20px;
+  }
+
+  .btnTrack > span {
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .btn:hover .btnTrack,
+  .btn:focus-visible .btnTrack {
+    transform: translateY(-20px);
+  }
+
+  .scrollCue {
+    margin-top: 4.5px;
+  }
+
+  .detail {
+    display: none;
+  }
+
+  /* Phone re-times the whole sequence: bigger offsets, later, slightly slower. */
+  .aMeta1 {
+    --fromY: 30px;
+    animation-delay: 400ms;
+  }
+
+  .aMeta2 {
+    --fromY: 40px;
+    animation-delay: 600ms;
+  }
+
+  .aTagline {
+    animation-duration: 600ms;
+    animation-delay: 500ms;
+  }
+
+  .aBtn1 {
+    animation-duration: 600ms;
+    animation-delay: 600ms;
+  }
+
+  .aBtn2 {
+    animation-duration: 600ms;
+    animation-delay: 800ms;
+  }
+
+  /* Phone swaps the arrow's spring for a plain tween. */
+  .aArrow {
+    animation: rise 600ms var(--tween) 900ms both;
+  }
+}
+
+/* ====================================================== wordmark variant === */
+
+/* Two lines whenever the column is phone-narrow, or the viewport is portrait
+ * enough to have the height for them. Keying the tall case off aspect rather
+ * than width alone is what stops a portrait tablet (820x1180) from landing on
+ * the one-line variant and rendering an 86px wordmark in a 1180px-tall hero.
+ * Placed after both breakpoint blocks so it wins on ordering. */
+@media (max-width: 809.98px), (max-aspect-ratio: 3 / 4) {
+  .wordmark .wmWide {
+    display: none;
+  }
+
+  .wordmark .wmPhone {
+    display: block;
+  }
+}
+
+/* ============================================================ small phone === */
+
+/* Below 360px the two bottom meta strings close to within ~12px of each other;
+ * dropping a point of type restores the gap. */
+@media (max-width: 359.98px) {
+  .metaRow {
+    font-size: 13px;
+  }
+}
+
+/* ========================================================= reduced motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .wmWide,
+  .wmPhoneL1,
+  .wmPhoneL2,
+  .aMeta1,
+  .aMeta2,
+  .aCard,
+  .aTagline,
+  .aBtn1,
+  .aBtn2,
+  .aBtnInner,
+  .aArrow,
+  .detail1,
+  .detail2,
+  .detail3,
+  .scrollCue,
+  .scrollCueInner {
+    animation: none;
+  }
+
+  /* detail 2 still needs its centring offset once the keyframe is gone —
+   * --fromX resolves to -50% on desktop and 0 on tablet. */
+  .detail2 {
+    transform: translateX(var(--fromX, 0));
+  }
+
+  .btnTrack {
+    transition: none;
+  }
+}
