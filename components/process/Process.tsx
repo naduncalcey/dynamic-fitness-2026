@@ -1,16 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Fragment, useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
-import type { StaticImageData } from "next/image";
+import { useEffect, useRef, useState } from "react";
 
-import cardAssessment from "@/public/process/card-1-assessment.jpg";
-import cardGoal from "@/public/process/card-2-goal.jpg";
-import cardFoundation from "@/public/process/card-3-foundation.jpg";
-import cardProgramming from "@/public/process/card-4-programming.webp";
-import cardCoaching from "@/public/process/card-5-coaching.jpg";
-import cardResults from "@/public/process/card-6-results.jpg";
+import HeadingWords from "@/components/shared/HeadingWords";
+import SanityImage from "@/components/shared/SanityImage";
 import iconAssessment from "@/public/process/icon-1-assessment.svg";
 import iconGoal from "@/public/process/icon-2-goal.svg";
 import iconFoundation from "@/public/process/icon-3-foundation.svg";
@@ -18,6 +12,7 @@ import iconProgramming from "@/public/process/icon-4-programming.svg";
 import iconCoaching from "@/public/process/icon-5-coaching.svg";
 import iconResults from "@/public/process/icon-6-results.svg";
 import iconTabProcess from "@/public/process/icon-tab-process.svg";
+import type { ProcessBlock } from "@/sanity/blocks";
 
 import styles from "./process.module.css";
 
@@ -45,82 +40,27 @@ function useInView<T extends HTMLElement>(threshold = 0) {
   return [ref, inView] as const;
 }
 
-type Card = {
-  n: string;
-  title: string;
-  copy: string;
-  icon: StaticImageData;
-  iconClass: string;
-  image: StaticImageData;
-  /** "image": photo fills the card under a dark gradient, media block is an
-   * invisible spacer. "fill": blush card with the photo in the media block. */
-  variant: "image" | "fill";
-};
+type Step = NonNullable<ProcessBlock["steps"]>[number];
 
-const CARDS: Card[] = [
-  {
-    n: "01",
-    title: "Assessment",
-    copy: "We assess fitness, goals, and movement patterns to set your baseline.",
-    icon: iconAssessment,
-    iconClass: "icoAssessment",
-    image: cardAssessment,
-    variant: "image",
-  },
-  {
-    n: "02",
-    title: "Goal Setting",
-    copy: "We define clear 30, 60, and 90-day goals with a focused plan.",
-    icon: iconGoal,
-    iconClass: "icoGoal",
-    image: cardGoal,
-    variant: "fill",
-  },
-  {
-    n: "03",
-    title: "Foundation",
-    copy: "We teach form, breathing, and core movements for safe training.",
-    icon: iconFoundation,
-    iconClass: "icoFoundation",
-    image: cardFoundation,
-    variant: "image",
-  },
-  {
-    n: "04",
-    title: "Programming",
-    copy: "We build structured programs with progressive overload for growth.",
-    icon: iconProgramming,
-    iconClass: "icoProgramming",
-    image: cardProgramming,
-    variant: "fill",
-  },
-  {
-    n: "05",
-    title: "Coaching",
-    copy: "We adapt every session in real time to drive better results.",
-    icon: iconCoaching,
-    iconClass: "icoCoaching",
-    image: cardCoaching,
-    variant: "image",
-  },
-  {
-    n: "06",
-    title: "Results",
-    copy: "We track progress, celebrate wins, and raise the next target.",
-    icon: iconResults,
-    iconClass: "icoResults",
-    image: cardResults,
-    variant: "fill",
-  },
-];
+/** The schema's icon values map to the glyph and its sizing class. */
+const ICONS = {
+  assessment: [iconAssessment, "icoAssessment"],
+  goal: [iconGoal, "icoGoal"],
+  foundation: [iconFoundation, "icoFoundation"],
+  programming: [iconProgramming, "icoProgramming"],
+  coaching: [iconCoaching, "icoCoaching"],
+  results: [iconResults, "icoResults"],
+} as const;
 
 /** One process card. A single 50%-threshold observer gates the card's rise
  * (the source's tween: opacity 0 / scale .95 / y 40 -> identity, .8s), the
  * number/copy fades, and the title's word reveal (500ms start + 50ms
  * stagger) — the card is invisible until then, so the grouping is exact. */
-function ProcessCard({ card }: { card: Card }) {
+function ProcessCard({ step, index }: { step: Step; index: number }) {
   const [ref, inView] = useInView<HTMLDivElement>(0.5);
-  const isImage = card.variant === "image";
+  // The treatment alternates down the list: photo-filled, then blush card.
+  const isImage = index % 2 === 0;
+  const [icon, iconClass] = ICONS[step.icon as keyof typeof ICONS] ?? [];
 
   return (
     <div
@@ -131,7 +71,7 @@ function ProcessCard({ card }: { card: Card }) {
       {isImage ? (
         <>
           <span className={styles.cardBg} aria-hidden="true">
-            <Image src={card.image} alt="" fill sizes="360px" />
+            <SanityImage image={step.image} alt="" fill sizes="360px" />
           </span>
           <span className={styles.cardGrad} aria-hidden="true" />
         </>
@@ -139,39 +79,34 @@ function ProcessCard({ card }: { card: Card }) {
       <span className={styles.cardTexture} aria-hidden="true" />
 
       <div className={styles.cardHead}>
-        <span className={`${styles.cardIcon} ${styles[card.iconClass]}`}>
-          <Image src={card.icon} alt="" aria-hidden="true" />
+        <span className={`${styles.cardIcon} ${styles[iconClass]}`}>
+          {icon ? <Image src={icon} alt="" aria-hidden="true" /> : null}
         </span>
-        <p className={styles.cardNum}>{card.n}</p>
+        <p className={styles.cardNum}>{String(index + 1).padStart(2, "0")}</p>
       </div>
 
       <div className={styles.cardBody}>
         <h4 className={styles.cardTitle}>
-          {card.title.split(" ").map((word, i) => (
-            <Fragment key={i}>
-              {i > 0 ? " " : null}
-              <span
-                className={styles.word}
-                style={{ "--wd": `${i * 50}ms` } as CSSProperties}
-              >
-                {word}
-              </span>
-            </Fragment>
-          ))}
+          <HeadingWords text={step.title} wordClass={styles.word} />
         </h4>
-        <p className={styles.cardCopy}>{card.copy}</p>
+        <p className={styles.cardCopy}>{step.copy}</p>
       </div>
 
       <div className={styles.cardMedia}>
         {!isImage ? (
-          <Image src={card.image} alt="" aria-hidden="true" fill sizes="328px" />
+          <SanityImage image={step.image} alt="" fill sizes="328px" />
         ) : null}
       </div>
     </div>
   );
 }
 
-export default function Process() {
+export default function Process({
+  eyebrow,
+  heading,
+  subcopy,
+  steps,
+}: Pick<ProcessBlock, "eyebrow" | "heading" | "subcopy" | "steps">) {
   const [h2Ref, h2In] = useInView<HTMLHeadingElement>(0.5);
   const [subRef, subIn] = useInView<HTMLParagraphElement>(0);
 
@@ -183,7 +118,7 @@ export default function Process() {
             <span className={styles.tabIcon}>
               <Image src={iconTabProcess} alt="" aria-hidden="true" />
             </span>
-            <p className={styles.tabText}>Process</p>
+            <p className={styles.tabText}>{eyebrow}</p>
           </div>
 
           <h2
@@ -191,17 +126,7 @@ export default function Process() {
             className={styles.heading}
             data-in={h2In ? "true" : undefined}
           >
-            {["Floor", "to", "Form"].map((word, i) => (
-              <Fragment key={word}>
-                {i > 0 ? " " : null}
-                <span
-                  className={styles.word}
-                  style={{ "--wd": `${i * 50}ms` } as CSSProperties}
-                >
-                  {word}
-                </span>
-              </Fragment>
-            ))}
+            <HeadingWords text={heading} wordClass={styles.word} />
           </h2>
 
           <p
@@ -209,13 +134,13 @@ export default function Process() {
             className={styles.subcopy}
             data-in={subIn ? "true" : undefined}
           >
-            We make getting fit easy, safe, and fun, no experience needed.
+            {subcopy}
           </p>
         </div>
 
         <div className={styles.grid}>
-          {CARDS.map((card) => (
-            <ProcessCard key={card.n} card={card} />
+          {steps?.map((step, i) => (
+            <ProcessCard key={step._key} step={step} index={i} />
           ))}
         </div>
       </div>

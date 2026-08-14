@@ -1,21 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { StaticImageData } from "next/image";
 import type { CSSProperties } from "react";
+
+import SanityImage from "@/components/shared/SanityImage";
+import type { BannerBlock } from "@/sanity/blocks";
 
 import styles from "./banner.module.css";
 
-type BannerProps = {
-  image: StaticImageData;
-  alt: string;
+type BannerProps = Pick<BannerBlock, "image"> & {
   /** Resting translateY of the effect's first target — the fighter banner
    * uses 30, the later banners settle from scale alone. */
   rise?: number;
-  /** object-position of the cover crop (source: fighter "50% 0%", rest
-   * default center). */
-  position?: string;
 };
 
 /** Full-viewport image banner — the source's sticky "Image" sections.
@@ -25,12 +21,7 @@ type BannerProps = {
  * view the image settles from scale 1.2 (plus an optional y offset) to
  * identity on the source's spring (stiffness 200, damping 60, mass 1);
  * leaving view resets it, exactly as the source's transform effect replays. */
-export default function Banner({
-  image,
-  alt,
-  rise = 0,
-  position = "50% 50%",
-}: BannerProps) {
+export default function Banner({ image, rise = 0 }: BannerProps) {
   const ref = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
 
@@ -52,15 +43,7 @@ export default function Banner({
       style={{ "--rise": `${rise}px` } as CSSProperties}
     >
       <div className={styles.zoom}>
-        <Image
-          src={image}
-          alt={alt}
-          fill
-          sizes="100vw"
-          quality={90}
-          placeholder="blur"
-          style={{ objectPosition: position }}
-        />
+        <SanityImage image={image} fill sizes="100vw" quality={90} useHotspot />
       </div>
     </section>
   );

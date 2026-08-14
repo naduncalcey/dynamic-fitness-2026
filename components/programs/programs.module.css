@@ -119,6 +119,82 @@
   letter-spacing: -0.1px;
 }
 
+/* --------------------------------------------------------- audience toggle */
+
+/* Segmented switch above the Ask CEO card, matched to its 256px width so the
+ * two read as one stacked unit.
+ *
+ * The filled state is a single thumb that slides between segments rather than
+ * a background swapping on each button — so the active state travels instead
+ * of blinking. Geometry is driven by --tg-count and --tg-active (set from the
+ * component), so it stays correct if a third audience is ever added. */
+.audienceToggle {
+  --tg-pad: 4px;
+  --tg-gap: 4px;
+  --tg-count: 2;
+  --tg-active: 0;
+
+  position: relative;
+  display: inline-flex;
+  width: 256px;
+  gap: var(--tg-gap);
+  padding: var(--tg-pad);
+  border: 1px solid var(--grey);
+  border-radius: 5px;
+}
+
+/* Width resolves against the container's padding box, translate against the
+ * thumb's own width — so one segment's travel is exactly width + gap. */
+.audienceThumb {
+  position: absolute;
+  top: var(--tg-pad);
+  bottom: var(--tg-pad);
+  left: var(--tg-pad);
+  width: calc(
+    (
+        100% - (2 * var(--tg-pad)) - ((var(--tg-count) - 1) * var(--tg-gap))
+      ) / var(--tg-count)
+  );
+  border-radius: 3px;
+  background: var(--ink);
+  transform: translateX(calc(var(--tg-active) * (100% + var(--tg-gap))));
+  transition: transform 0.5s var(--fadeSpring);
+  pointer-events: none;
+}
+
+.audienceOption {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  cursor: pointer;
+  transition: color 0.4s var(--flipEase);
+}
+
+.audienceOption[aria-pressed="true"] {
+  color: #fff;
+}
+
+.audienceOption:hover:not([aria-pressed="true"]) {
+  color: var(--ink);
+}
+
+.audienceOption:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 /* ------------------------------------------------------------ Ask CEO card */
 
 .askSlot {
@@ -289,6 +365,18 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* Card eyebrow: a quiet label above the title. Kept muted rather than red so
+ * it doesn't compete with the card number sitting directly above it. */
+.cardEyebrow {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
 
 .cardTitle {
@@ -497,6 +585,7 @@
 }
 
 .subcopy,
+.cardEyebrow,
 .cardCopy,
 .cardMeta,
 .askSlot {
@@ -504,6 +593,7 @@
 }
 
 .subcopy[data-in="true"],
+.cardEyebrow[data-in="true"],
 .cardCopy[data-in="true"],
 .cardMeta[data-in="true"] {
   animation: fadeIn 400ms var(--fadeSpring) both;
@@ -565,6 +655,28 @@
   }
 }
 
+/* Cards swapped in by the audience toggle are already on screen, so replaying
+ * the scroll-in choreography would read as lag — the enroll slot alone waits
+ * 1.2s before it starts. Those cards render settled instead. The reveal is
+ * untouched on first scroll; this only applies once the toggle has been used.
+ *
+ * Specificity is matched to the [data-in="true"] rules above deliberately —
+ * these must come later in the file to win. */
+.instant .cardEyebrow,
+.instant .cardCopy,
+.instant .cardMeta,
+.instant .enrollSlot,
+.instant .cardEyebrow[data-in="true"],
+.instant .cardCopy[data-in="true"],
+.instant .cardMeta[data-in="true"],
+.instant .enrollSlot[data-in="true"],
+.instant .enroll,
+.instant .enrollSlot[data-in="true"] .enroll {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
 /* =============================================================== TABLET === */
 
 @media (max-width: 1199.98px) {
@@ -601,6 +713,11 @@
   .cardMeta {
     font-size: 15px;
     line-height: 20px;
+  }
+
+  .cardEyebrow {
+    font-size: 12px;
+    line-height: 16px;
   }
 
   .cardTitle {
@@ -675,6 +792,11 @@
     line-height: 20px;
   }
 
+  .cardEyebrow {
+    font-size: 11px;
+    line-height: 16px;
+  }
+
   .enroll {
     height: 40px;
     font-size: 14px;
@@ -701,6 +823,7 @@
 @media (prefers-reduced-motion: reduce) {
   .word,
   .subcopy,
+  .cardEyebrow,
   .cardCopy,
   .cardMeta,
   .askSlot,
@@ -714,7 +837,9 @@
 
   .enrollTrack,
   .askIconTrack,
-  .askAvatar img {
+  .askAvatar img,
+  .audienceOption,
+  .audienceThumb {
     transition: none;
   }
 }

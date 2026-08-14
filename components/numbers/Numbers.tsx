@@ -1,12 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { StaticImageData } from "next/image";
 
-import statImg1 from "@/public/numbers/stat-img-1.png";
-import statImg2 from "@/public/numbers/stat-img-2.webp";
-import statImg3 from "@/public/numbers/stat-img-3.webp";
+import SanityImage from "@/components/shared/SanityImage";
+import type { NumbersBlock } from "@/sanity/blocks";
 
 import styles from "./numbers.module.css";
 
@@ -20,17 +17,19 @@ const HOVER_FACTOR = 0.6;
 const COUNTER_W0 = 9.2334;
 const COUNTER_MS = 1000;
 
-type Stat = { value: number; suffix: string; label: string };
-
-const STATS: [Stat, StaticImageData][] = [
-  [{ value: 35, suffix: "+", label: "Certified Coaches" }, statImg1],
-  [{ value: 427, suffix: "+", label: "Members Trained" }, statImg2],
-  [{ value: 7, suffix: "+", label: "Registered Gyms" }, statImg3],
-];
+type Stat = NonNullable<NumbersBlock["stats"]>[number];
 
 /** Count-up number. A ghost copy of the final value reserves the layout box
  * (the source's `balance` option) while the animated copy sits on top. */
-function Counter({ value, suffix, run }: Stat & { run: boolean }) {
+function Counter({
+  value,
+  suffix,
+  run,
+}: {
+  value: number;
+  suffix: string;
+  run: boolean;
+}) {
   const ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -66,26 +65,38 @@ function Counter({ value, suffix, run }: Stat & { run: boolean }) {
 }
 
 function TickerSet({
+  stats,
   run,
   hidden,
   setRef,
 }: {
+  stats: Stat[];
   run: boolean;
   hidden: boolean;
   setRef?: React.Ref<HTMLDivElement>;
 }) {
   return (
     <div className={styles.set} ref={setRef} aria-hidden={hidden || undefined}>
-      {STATS.map(([stat, img], i) => (
-        <div className={styles.pair} key={i}>
+      {stats.map((stat) => (
+        <div className={styles.pair} key={stat._key}>
           <div className={styles.stat}>
             <span className={styles.statTexture} aria-hidden="true" />
-            <Counter {...stat} run={run} />
+            <Counter
+              value={stat.value ?? 0}
+              suffix={stat.suffix ?? ""}
+              run={run}
+            />
             <p className={styles.statLabel}>{stat.label}</p>
             <span className={styles.statLine} aria-hidden="true" />
           </div>
           <div className={styles.photo}>
-            <Image src={img} alt="" aria-hidden="true" fill sizes="268px" />
+            <SanityImage
+              image={stat.image}
+              alt=""
+              aria-hidden="true"
+              fill
+              sizes="268px"
+            />
           </div>
         </div>
       ))}
@@ -95,7 +106,7 @@ function TickerSet({
 
 /** Stats carousel under the About section — the source's "Numbers" ticker.
  * Hidden below 768px. */
-export default function Numbers() {
+export default function Numbers({ stats }: Pick<NumbersBlock, "stats">) {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const setElRef = useRef<HTMLDivElement>(null);
@@ -174,6 +185,7 @@ export default function Numbers() {
           {[0, 1, 2, 3].map((i) => (
             <TickerSet
               key={i}
+              stats={stats ?? []}
               run={run}
               hidden={i > 0}
               setRef={i === 0 ? setElRef : undefined}

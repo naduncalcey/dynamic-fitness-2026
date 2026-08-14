@@ -1,10 +1,10 @@
 import Image from "next/image";
 
+import SanityImage from "@/components/shared/SanityImage";
 import arrowDown from "@/public/hero/arrow-down.svg";
 import badge from "@/public/hero/badge.svg";
-import ceoAvatar from "@/public/hero/ceo-avatar.jpg";
-import heroBg from "@/public/hero/hero-bg.png";
 import star from "@/public/hero/star.svg";
+import type { HeroBlock } from "@/sanity/blocks";
 
 import styles from "./hero.module.css";
 
@@ -59,6 +59,7 @@ function Wordmark() {
 type ButtonProps = {
   href: string;
   label: string;
+  /** The first button in the list is the primary action. */
   variant: "primary" | "secondary";
   /** Container class carrying the outer tween; the button springs separately. */
   riseClass: string;
@@ -94,19 +95,34 @@ function Spacer() {
   return <span className={styles.plusSpacer} />;
 }
 
-export default function Hero() {
+type HeroProps = Pick<
+  HeroBlock,
+  "backgroundImage" | "ratingScore" | "highlights" | "contactCard" | "tagline" | "ctas"
+>;
+
+const RISE_CLASSES = ["aBtn1", "aBtn2"] as const;
+
+export default function Hero({
+  backgroundImage,
+  ratingScore,
+  highlights,
+  contactCard,
+  tagline,
+  ctas,
+}: HeroProps) {
+  const [firstHighlight, ...restHighlights] = highlights ?? [];
+
   return (
     <section className={styles.hero}>
       <div className={styles.frame}>
         <div className={styles.backdrop}>
-          <Image
-            src={heroBg}
-            alt="Athlete resting between pull-up sets in a dimly lit gym"
+          <SanityImage
+            image={backgroundImage}
             fill
             sizes="100vw"
             priority
             quality={90}
-            placeholder="blur"
+            useHotspot
           />
         </div>
 
@@ -123,69 +139,68 @@ export default function Hero() {
                     </span>
                   ))}
                 </span>
-                <span>5 / 5</span>
+                <span>{ratingScore}</span>
               </span>
-              <span>35 Certified Coaches</span>
+              <span>{firstHighlight}</span>
             </div>
 
             <div className={`${styles.metaRow} ${styles.metaRowLast} ${styles.aMeta2}`}>
-              <span>Best Rated Gym Club</span>
-              <span>New York, NY | Miami, FL</span>
+              {restHighlights.map((highlight) => (
+                <span key={highlight}>{highlight}</span>
+              ))}
             </div>
 
-            <a
-              href="/contact"
-              className={`${styles.ceoCard} ${styles.aCard}`}
-            >
-              <span className={styles.ceoAvatar}>
-                <Image
-                  src={ceoAvatar}
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  sizes="64px"
-                />
-              </span>
-              <span className={styles.ceoBody}>
-                <span className={styles.ceoTitleRow}>
-                  <span className={styles.ceoTitle}>Talk to CEO</span>
-                  <Image
-                    className={styles.ceoBadge}
-                    src={badge}
+            {contactCard ? (
+              <a
+                href={contactCard.href ?? "#"}
+                className={`${styles.ceoCard} ${styles.aCard}`}
+              >
+                <span className={styles.ceoAvatar}>
+                  <SanityImage
+                    image={contactCard.avatar}
                     alt=""
                     aria-hidden="true"
-                    width={19}
-                    height={19}
+                    fill
+                    sizes="64px"
                   />
                 </span>
-                <span className={styles.ceoMeta}>
-                  <span>Alicia J.</span>
-                  <br />
-                  <span>CEO, ACE-CPT</span>
+                <span className={styles.ceoBody}>
+                  <span className={styles.ceoTitleRow}>
+                    <span className={styles.ceoTitle}>{contactCard.title}</span>
+                    <Image
+                      className={styles.ceoBadge}
+                      src={badge}
+                      alt=""
+                      aria-hidden="true"
+                      width={19}
+                      height={19}
+                    />
+                  </span>
+                  <span className={styles.ceoMeta}>
+                    <span>{contactCard.personName}</span>
+                    <br />
+                    <span>{contactCard.personRole}</span>
+                  </span>
                 </span>
-              </span>
-            </a>
+              </a>
+            ) : null}
           </div>
 
           <div className={styles.body}>
             <p className={`${styles.tagline} ${styles.aTagline}`}>
-              Built for people who want more than a gym membership. Expert
-              coaching and a plan that works.
+              {tagline}
             </p>
 
             <div className={styles.actions}>
-              <HeroButton
-                href="/contact"
-                label="Get Started"
-                variant="primary"
-                riseClass={styles.aBtn1}
-              />
-              <HeroButton
-                href="/blog"
-                label="Explore Blog"
-                variant="secondary"
-                riseClass={styles.aBtn2}
-              />
+              {ctas?.map((cta, i) => (
+                <HeroButton
+                  key={cta._key}
+                  href={cta.href ?? "#"}
+                  label={cta.label ?? ""}
+                  variant={i === 0 ? "primary" : "secondary"}
+                  riseClass={styles[RISE_CLASSES[i] ?? "aBtn2"]}
+                />
+              ))}
             </div>
 
             <a

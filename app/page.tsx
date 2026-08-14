@@ -1,46 +1,30 @@
-import About from "@/components/about/About";
-import Banner from "@/components/banner/Banner";
-import Faq from "@/components/faq/Faq";
-import Hero from "@/components/hero/Hero";
-import Numbers from "@/components/numbers/Numbers";
-import Process from "@/components/process/Process";
-import Programs from "@/components/programs/Programs";
-import Testimonials from "@/components/testimonials/Testimonials";
-import bannerBoxer from "@/public/banner/banner-boxer.webp";
-import bannerFighter from "@/public/banner/banner-fighter.webp";
-import bannerHands from "@/public/banner/banner-hands.webp";
-import bannerSled from "@/public/banner/banner-sled.webp";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-export default function Home() {
-  return (
-    <>
-      <Hero />
-      {/* Scroll target for the hero's arrow cue. */}
-      <div id="hero-next" />
-      <About />
-      <Numbers />
-      <Banner
-        image={bannerFighter}
-        alt="Fighter with wraps in a knee-strike stance against an orange backdrop."
-        rise={30}
-        position="50% 0%"
-      />
-      <Programs />
-      <Banner
-        image={bannerSled}
-        alt="Man doing a sled push workout in a dimly lit gym."
-      />
-      <Process />
-      <Banner
-        image={bannerBoxer}
-        alt="Boxer in red gloves in a training stance beside a heavy bag."
-      />
-      <Testimonials />
-      <Banner
-        image={bannerHands}
-        alt="Smiling group's hands reach together, R logo in center, viewed from below."
-      />
-      <Faq />
-    </>
-  );
+import PageBuilder from "@/components/PageBuilder";
+import { client } from "@/sanity/client";
+import { PAGE_QUERY } from "@/sanity/queries";
+
+const options = { next: { revalidate: 30 } };
+
+async function getHomePage() {
+  return client.fetch(PAGE_QUERY, { slug: "home" }, options);
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getHomePage();
+  if (!page) return {};
+
+  return {
+    title: page.seoTitle ?? page.title ?? undefined,
+    description: page.seoDescription ?? undefined,
+  };
+}
+
+export default async function Home() {
+  const page = await getHomePage();
+
+  if (!page) notFound();
+
+  return <PageBuilder blocks={page.pageBuilder} />;
 }

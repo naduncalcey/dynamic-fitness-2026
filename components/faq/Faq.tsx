@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Fragment, useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import HeadingWords from "@/components/shared/HeadingWords";
 import iconTabFaq from "@/public/faq/icon-tab-faq.svg";
 import rLogo from "@/public/faq/r-logo.svg";
+import type { FaqBlock } from "@/sanity/blocks";
 
 import styles from "./faq.module.css";
 
@@ -33,42 +34,7 @@ function useInView<T extends HTMLElement>(threshold = 0) {
   return [ref, inView] as const;
 }
 
-type Faq = { q: string; a: string };
-
-const FAQS: Faq[] = [
-  {
-    q: "Do I need any fitness experience to join?",
-    a: "Not at all! We welcome complete beginners. Our Beginner Fitness Bootcamp is designed for people with zero experience. Your coach guides you through everything from day one.",
-  },
-  {
-    q: "What should I bring to my first session?",
-    a: "Just comfortable workout clothes, athletic shoes, a water bottle, and a towel. We provide all equipment needed during training.",
-  },
-  {
-    q: "Are programs safe for kids and teens?",
-    a: "Absolutely. Our Kids & Teens Camp is led by certified youth coaches trained in age-appropriate programming. All sessions are fully supervised.",
-  },
-  {
-    q: "Can I book personal training sessions?",
-    a: "Yes! We offer 1-on-1 personal training as part of our Advanced Performance program or as standalone sessions. Get in touch to book yours.",
-  },
-  {
-    q: "How do I become a member of the club?",
-    a: "Simply head to our Contact page, fill out the form, and one of our team members will reach out within 24 hours to get you set up. You can also walk into any of our locations during opening hours and we'll get you started on the spot.",
-  },
-  {
-    q: "Can I do Group Classes and personal training at the same time?",
-    a: "Absolutely, and we encourage it. Many of our members combine 2 to 3 Group Classes per week with 1 personal training session for an incredibly well-rounded approach to their fitness.",
-  },
-  {
-    q: "Is there a joining fee or initiation cost?",
-    a: "We keep it simple, no hidden fees, no surprises. There's a one-time enrollment fee of $49 which covers your initial fitness assessment, goal-setting session, and your Rep Republic welcome kit.",
-  },
-  {
-    q: "Do you offer month-to-month or only annual contracts?",
-    a: "We offer both. Our month-to-month membership gives you full flexibility, while our annual plan saves you up to 20%.",
-  },
-];
+type Faq = NonNullable<FaqBlock["faqs"]>[number];
 
 /** The X glyph from the source (18px, 2.25 stroke). Rotated 45deg while the
  * row is closed (reads as a plus), straightens to an X when open. */
@@ -106,14 +72,14 @@ function FaqRow({ faq }: { faq: Faq }) {
         onClick={() => setOpen((v) => !v)}
       >
         <span className={styles.rowHead}>
-          <h3 className={styles.question}>{faq.q}</h3>
+          <h3 className={styles.question}>{faq.question}</h3>
           <span className={styles.xBox}>
             <XIcon />
           </span>
         </span>
         <span className={styles.answerClip}>
           <span className={styles.answerInner}>
-            <span className={styles.answer}>{faq.a}</span>
+            <span className={styles.answer}>{faq.answer}</span>
           </span>
         </span>
       </button>
@@ -121,7 +87,12 @@ function FaqRow({ faq }: { faq: Faq }) {
   );
 }
 
-export default function Faq() {
+export default function Faq({
+  eyebrow,
+  heading,
+  faqs,
+  videoUrl,
+}: Pick<FaqBlock, "eyebrow" | "heading" | "faqs" | "videoUrl">) {
   const [h2Ref, h2In] = useInView<HTMLHeadingElement>(0.5);
 
   return (
@@ -133,7 +104,7 @@ export default function Faq() {
               <span className={styles.tabIcon}>
                 <Image src={iconTabFaq} alt="" aria-hidden="true" />
               </span>
-              <p className={styles.tabText}>FAQs</p>
+              <p className={styles.tabText}>{eyebrow}</p>
             </div>
 
             <h2
@@ -141,23 +112,13 @@ export default function Faq() {
               className={styles.heading}
               data-in={h2In ? "true" : undefined}
             >
-              {["Got", "Questions?"].map((word, i) => (
-                <Fragment key={word}>
-                  {i > 0 ? <br /> : null}
-                  <span
-                    className={styles.word}
-                    style={{ "--wd": `${i * 50}ms` } as CSSProperties}
-                  >
-                    {word}
-                  </span>
-                </Fragment>
-              ))}
+              <HeadingWords text={heading} wordClass={styles.word} />
             </h2>
           </div>
 
           <div className={styles.rows}>
-            {FAQS.map((faq) => (
-              <FaqRow key={faq.q} faq={faq} />
+            {faqs?.map((faq) => (
+              <FaqRow key={faq._key} faq={faq} />
             ))}
           </div>
         </div>
@@ -165,7 +126,7 @@ export default function Faq() {
         <div className={styles.videoCol}>
           <video
             className={styles.video}
-            src="/faq/faq-video.mp4"
+            src={videoUrl ?? undefined}
             autoPlay
             muted
             loop

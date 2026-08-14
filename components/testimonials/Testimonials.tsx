@@ -3,17 +3,13 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import type { StaticImageData } from "next/image";
 
+import SanityImage from "@/components/shared/SanityImage";
 import OrangeTicker from "@/components/ticker/OrangeTicker";
-import bannerFighter from "@/public/banner/banner-fighter.webp";
 import iconCheck from "@/public/testimonials/icon-check.svg";
 import iconQuote from "@/public/testimonials/icon-quote.svg";
 import iconTabTestimonials from "@/public/testimonials/icon-tab-testimonials.svg";
-import user1 from "@/public/testimonials/user-1.webp";
-import user3 from "@/public/testimonials/user-3.jpg";
-import user4 from "@/public/testimonials/user-4.jpg";
-import user5 from "@/public/testimonials/user-5.jpg";
+import type { TestimonialsBlock } from "@/sanity/blocks";
 
 import styles from "./testimonials.module.css";
 
@@ -50,62 +46,13 @@ function Fade({ className, children }: { className: string; children: ReactNode 
   );
 }
 
-type Testimonial = {
-  quote: string;
-  name: string;
-  location: string;
-  program: string;
-  image: StaticImageData;
-};
-
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "“From my first session to my first pull-up, every milestone felt like a massive celebration.”",
-    name: "Brittany H.",
-    location: "Austin, TX",
-    program: "Beginner Bootcamp • 4 weeks",
-    image: user1,
-  },
-  {
-    quote:
-      "“The coaches push you just. I never knew fitness could be this enjoyable.”",
-    name: "Marcus",
-    location: "Chicago, IL",
-    program: "Strength & Conditioning ",
-    image: bannerFighter,
-  },
-  {
-    quote:
-      "“This gym changed my life, I lost 30 lbs and gained confidence I didn’t know I had.”",
-    name: "Steve J.",
-    location: "Houston, TX",
-    program: "Weight Loss Program • 8 weeks",
-    image: user3,
-  },
-  {
-    quote:
-      "“The coaches’ energy turned my fear of the gym into a full-on obsession with lifting.”",
-    name: "Travis R.",
-    location: "Los Angeles, CA",
-    program: "Advanced Training • 1-on-1 Coaching",
-    image: user4,
-  },
-  {
-    quote:
-      "“From my first session to my first pull-up, every milestone felt like a massive celebration.”",
-    name: "Brittany H.",
-    location: "Austin, TX",
-    program: "Strength & Conditioning  • 12 weeks",
-    image: user5,
-  },
-];
+type Testimonial = NonNullable<TestimonialsBlock["testimonials"]>[number];
 
 function TestimonialCard({ t }: { t: Testimonial }) {
   return (
     <article className={styles.card}>
       <span className={styles.cardBg} aria-hidden="true">
-        <Image src={t.image} alt="" fill sizes="370px" />
+        <SanityImage image={t.image} alt="" fill sizes="370px" />
       </span>
       <span className={styles.cardOverlay} aria-hidden="true" />
 
@@ -133,9 +80,17 @@ function TestimonialCard({ t }: { t: Testimonial }) {
   );
 }
 
-export default function Testimonials() {
+export default function Testimonials({
+  eyebrow,
+  heading,
+  subcopy,
+  testimonials,
+}: Pick<
+  TestimonialsBlock,
+  "eyebrow" | "heading" | "subcopy" | "testimonials"
+>) {
   const [subRef, subIn] = useInView<HTMLParagraphElement>(0);
-  const [t1, t2, t3, t4, t5] = TESTIMONIALS;
+  const [t1, t2, t3, t4, t5] = testimonials ?? [];
 
   return (
     <section className={styles.testimonials}>
@@ -149,37 +104,40 @@ export default function Testimonials() {
             <span className={styles.tabIcon}>
               <Image src={iconTabTestimonials} alt="" aria-hidden="true" />
             </span>
-            <p className={styles.tabText}>Testimonials</p>
+            <p className={styles.tabText}>{eyebrow}</p>
           </div>
-          <h2 className={styles.heading}>Members&rsquo; Words</h2>
+          <h2 className={styles.heading}>{heading}</h2>
           <p
             ref={subRef}
             className={styles.subcopy}
             data-in={subIn ? "true" : undefined}
           >
-            Real stories from people who showed up, put in the work, and
-            changed their lives.
+            {subcopy}
           </p>
         </div>
       </div>
 
       <div className={styles.cards}>
         <div className={styles.row}>
-          <TestimonialCard t={t1} />
-          <div className={styles.offset}>
-            <TestimonialCard t={t2} />
-          </div>
+          {t1 ? <TestimonialCard t={t1} /> : null}
+          {t2 ? (
+            <div className={styles.offset}>
+              <TestimonialCard t={t2} />
+            </div>
+          ) : null}
         </div>
 
         <div className={`${styles.row} ${styles.rowSingle}`}>
-          <TestimonialCard t={t3} />
+          {t3 ? <TestimonialCard t={t3} /> : null}
         </div>
 
         <div className={`${styles.row} ${styles.rowLast}`}>
-          <div className={styles.offset}>
-            <TestimonialCard t={t4} />
-          </div>
-          <TestimonialCard t={t5} />
+          {t4 ? (
+            <div className={styles.offset}>
+              <TestimonialCard t={t4} />
+            </div>
+          ) : null}
+          {t5 ? <TestimonialCard t={t5} /> : null}
         </div>
 
         <div className={styles.spacer} aria-hidden="true" />

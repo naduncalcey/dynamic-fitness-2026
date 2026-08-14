@@ -1,14 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
+import HeadingWords from "@/components/shared/HeadingWords";
+import SanityImage from "@/components/shared/SanityImage";
 import OrangeTicker from "@/components/ticker/OrangeTicker";
-import ceoAvatar from "@/public/programs/ceo-avatar.jpg";
 import iconAskArrow from "@/public/programs/icon-ask-arrow.svg";
 import iconStar from "@/public/programs/icon-star.svg";
 import iconTabDumbbell from "@/public/programs/icon-tab-dumbbell.svg";
+import type { ProgramsBlock } from "@/sanity/blocks";
 
 import styles from "./programs.module.css";
 
@@ -64,58 +66,23 @@ function Reveal({
 
 const STARS = [0, 1, 2, 3, 4];
 
-type Program = {
-  n: string;
-  title: string;
-  copy: string;
-  meta: string;
-  trusted: string;
-};
-
-const PROGRAMS: Program[] = [
-  {
-    n: "01",
-    title: "Beginner Fitness Bootcamp",
-    copy: "Learn proper form, master basics, and build a strong foundation to confidently begin your fitness journey.",
-    meta: "4 Weeks · Equipment Provided",
-    trusted: "Trusted by 310+ members",
-  },
-  {
-    n: "02",
-    title: "Strength & Conditioning",
-    copy: "Refine technique, increase strength, and unlock greater power with progressive training built to level you up.",
-    meta: "6 Weeks · Equipment Provided",
-    trusted: "Trusted by 245+ members",
-  },
-  {
-    n: "03",
-    title: "Advanced Training",
-    copy: "Train like an athlete with focused programming designed to boost speed, strength, and peak performance.",
-    meta: "1-on-1 Coaching · Custom Plan",
-    trusted: "Trusted by 180+ members",
-  },
-  {
-    n: "04",
-    title: "Weight Loss Program",
-    copy: "Burn fat effectively with structured workouts and practical nutrition guidance built for lasting results.",
-    meta: "8 Weeks · Nutrition Plan Included",
-    trusted: "Trusted by 120+ members",
-  },
-  {
-    n: "05",
-    title: "Group Classes",
-    copy: "Join high-energy, coach-led sessions that build strength, endurance, and consistency in a motivating setting.",
-    meta: "Daily Classes · All Levels Welcome",
-    trusted: "Trusted by 430+ members",
-  },
-];
+type Program = NonNullable<ProgramsBlock["programs"]>[number];
 
 /** Sticky-stacked program card. The wrapper pins at a staggered offset
  * (120px + 70px per card on desktop) so cards pile up as you scroll. */
-function ProgramCard({ program, index }: { program: Program; index: number }) {
+function ProgramCard({
+  program,
+  index,
+  instant = false,
+}: {
+  program: Program;
+  index: number;
+  /** Skip the scroll-in reveal for cards the toggle swapped in mid-view. */
+  instant?: boolean;
+}) {
   return (
     <div
-      className={styles.cardWrap}
+      className={`${styles.cardWrap} ${instant ? styles.instant : ""}`}
       style={{ "--i": index } as CSSProperties}
     >
       <article
@@ -123,12 +90,19 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
       >
         <span className={styles.cardTexture} aria-hidden="true" />
 
-        <p className={styles.cardTime}>{program.n}</p>
+        <p className={styles.cardTime}>
+          {String(index + 1).padStart(2, "0")}
+        </p>
 
         <div className={styles.topic}>
+          {program.eyebrow ? (
+            <Reveal as="p" className={styles.cardEyebrow}>
+              {program.eyebrow}
+            </Reveal>
+          ) : null}
           <h3 className={styles.cardTitle}>{program.title}</h3>
           <Reveal as="p" className={styles.cardCopy}>
-            {program.copy}
+            {program.description}
           </Reveal>
           <Reveal as="p" className={styles.cardMeta}>
             {program.meta}
@@ -146,19 +120,21 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
                   </span>
                 ))}
               </span>
-              <p className={styles.trusted}>{program.trusted}</p>
+              <p className={styles.trusted}>{program.trustedLabel}</p>
             </div>
 
-            <Reveal as="span" className={styles.enrollSlot}>
-              <a href="/contact" className={styles.enroll}>
-                <span className={styles.enrollLabel}>
-                  <span className={styles.enrollTrack}>
-                    <span>Enroll Now</span>
-                    <span aria-hidden="true">Enroll Now</span>
+            {program.cta ? (
+              <Reveal as="span" className={styles.enrollSlot}>
+                <a href={program.cta.href ?? "#"} className={styles.enroll}>
+                  <span className={styles.enrollLabel}>
+                    <span className={styles.enrollTrack}>
+                      <span>{program.cta.label}</span>
+                      <span aria-hidden="true">{program.cta.label}</span>
+                    </span>
                   </span>
-                </span>
-              </a>
-            </Reveal>
+                </a>
+              </Reveal>
+            ) : null}
           </div>
         </div>
       </article>
@@ -166,8 +142,50 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
   );
 }
 
-export default function Programs() {
+type Audience = "individual" | "couple";
+
+export default function Programs({
+  eyebrow,
+  heading,
+  subcopy,
+  audienceToggle,
+  contactCard,
+  programs,
+}: Pick<
+  ProgramsBlock,
+  | "eyebrow"
+  | "heading"
+  | "subcopy"
+  | "audienceToggle"
+  | "contactCard"
+  | "programs"
+>) {
   const [h2Ref, h2In] = useInView<HTMLHeadingElement>(0.5);
+  const [audience, setAudience] = useState<Audience>("individual");
+  // Once the toggle is used, cards appear mid-view rather than on scroll, so
+  // they should render settled instead of replaying the reveal.
+  const [switched, setSwitched] = useState(false);
+
+  const all = programs ?? [];
+  // Cards authored before the audience field existed default to individual.
+  const forAudience = (value: Audience) =>
+    all.filter((p) => (p.audience ?? "individual") === value);
+
+  const individual = forAudience("individual");
+  const couple = forAudience("couple");
+
+  // A one-sided toggle is just noise, so it only shows when both sides exist.
+  const showToggle = individual.length > 0 && couple.length > 0;
+  const visible = showToggle
+    ? audience === "couple"
+      ? couple
+      : individual
+    : all;
+
+  const options: { value: Audience; label: string }[] = [
+    { value: "individual", label: audienceToggle?.individualLabel ?? "Individual" },
+    { value: "couple", label: audienceToggle?.coupleLabel ?? "Couple" },
+  ];
 
   return (
     <section className={styles.programs}>
@@ -180,7 +198,7 @@ export default function Programs() {
               <span className={styles.tabIcon}>
                 <Image src={iconTabDumbbell} alt="" aria-hidden="true" />
               </span>
-              <p className={styles.tabText}>Programs</p>
+              <p className={styles.tabText}>{eyebrow}</p>
             </div>
 
             <h2
@@ -188,53 +206,87 @@ export default function Programs() {
               className={styles.heading}
               data-in={h2In ? "true" : undefined}
             >
-              {["Find", "Your", "Program"].map((word, i) => (
-                <Fragment key={word}>
-                  {i > 0 ? " " : null}
-                  <span
-                    className={styles.word}
-                    style={{ "--wd": `${i * 50}ms` } as CSSProperties}
-                  >
-                    {word}
-                  </span>
-                </Fragment>
-              ))}
+              <HeadingWords text={heading} wordClass={styles.word} />
             </h2>
 
             <Reveal as="p" className={styles.subcopy}>
-              Inspire every member to reach their full potential through
-              smart, safe, and high-energy training.
+              {subcopy}
             </Reveal>
           </div>
 
-          <Reveal as="span" className={styles.askSlot}>
-            <a href="/contact" className={styles.askCeo}>
-              <span className={styles.askAvatar}>
-                <Image src={ceoAvatar} alt="" aria-hidden="true" fill sizes="64px" />
-              </span>
-              <span className={styles.askContent}>
-                <span className={styles.askHeadRow}>
-                  <span className={styles.askTitle}>Ask CEO</span>
-                  <span className={styles.askIcon} aria-hidden="true">
-                    <span className={styles.askIconTrack}>
-                      <Image src={iconAskArrow} alt="" />
-                      <Image src={iconAskArrow} alt="" />
+          {showToggle ? (
+            <div
+              className={styles.audienceToggle}
+              role="group"
+              aria-label="Membership type"
+              style={
+                {
+                  "--tg-count": options.length,
+                  "--tg-active": options.findIndex(
+                    (option) => option.value === audience,
+                  ),
+                } as CSSProperties
+              }
+            >
+              <span className={styles.audienceThumb} aria-hidden="true" />
+              {options.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={styles.audienceOption}
+                  aria-pressed={audience === option.value}
+                  onClick={() => {
+                    setAudience(option.value);
+                    setSwitched(true);
+                  }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {contactCard ? (
+            <Reveal as="span" className={styles.askSlot}>
+              <a href={contactCard.href ?? "#"} className={styles.askCeo}>
+                <span className={styles.askAvatar}>
+                  <SanityImage
+                    image={contactCard.avatar}
+                    alt=""
+                    aria-hidden="true"
+                    fill
+                    sizes="64px"
+                  />
+                </span>
+                <span className={styles.askContent}>
+                  <span className={styles.askHeadRow}>
+                    <span className={styles.askTitle}>{contactCard.title}</span>
+                    <span className={styles.askIcon} aria-hidden="true">
+                      <span className={styles.askIconTrack}>
+                        <Image src={iconAskArrow} alt="" />
+                        <Image src={iconAskArrow} alt="" />
+                      </span>
                     </span>
                   </span>
+                  <span className={styles.askMeta}>
+                    <span>{contactCard.personName}</span>
+                    <br />
+                    <span>{contactCard.personRole}</span>
+                  </span>
                 </span>
-                <span className={styles.askMeta}>
-                  <span>Alicia J.</span>
-                  <br />
-                  <span>CEO, ACE-CPT</span>
-                </span>
-              </span>
-            </a>
-          </Reveal>
+              </a>
+            </Reveal>
+          ) : null}
         </div>
 
         <div className={styles.sessions}>
-          {PROGRAMS.map((program, i) => (
-            <ProgramCard key={program.n} program={program} index={i} />
+          {visible.map((program, i) => (
+            <ProgramCard
+              key={program._key}
+              program={program}
+              index={i}
+              instant={switched}
+            />
           ))}
         </div>
       </div>

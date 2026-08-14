@@ -4,9 +4,11 @@ import Image from "next/image";
 import { Fragment, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
+import HeadingWords from "@/components/shared/HeadingWords";
 import OrangeTicker from "@/components/ticker/OrangeTicker";
 import iconDumbbellHeading from "@/public/about/icon-dumbbell-heading.svg";
 import iconTarget from "@/public/about/icon-target.svg";
+import type { AboutBlock } from "@/sanity/blocks";
 
 import styles from "./about.module.css";
 
@@ -35,18 +37,20 @@ function useInView<T extends HTMLElement>(threshold = 0) {
   return [ref, inView] as const;
 }
 
-type BlockProps = {
-  icon: typeof iconTarget;
-  iconClass: string;
-  title: string;
-  copy: string;
-};
+type CopyBlock = NonNullable<AboutBlock["blocks"]>[number];
+
+/** The schema's icon values map to the glyph and its sizing class. */
+const ICONS = {
+  dumbbell: [iconDumbbellHeading, "icoDumbbellHead"],
+  target: [iconTarget, "icoTarget"],
+} as const;
 
 /** "Who We Are" / "What Drives Us" block: word-by-word title reveal at 50%
  * visibility (500ms head start, 50ms stagger), copy fades on first pixel. */
-function AboutBlock({ icon, iconClass, title, copy }: BlockProps) {
+function AboutBlock({ block }: { block: CopyBlock }) {
   const [headRef, headIn] = useInView<HTMLDivElement>(0.5);
   const [copyRef, copyIn] = useInView<HTMLParagraphElement>(0);
+  const [icon, iconClass] = ICONS[block.icon as keyof typeof ICONS] ?? [];
 
   return (
     <div className={styles.block}>
@@ -56,21 +60,11 @@ function AboutBlock({ icon, iconClass, title, copy }: BlockProps) {
         data-in={headIn ? "true" : undefined}
         style={{ "--wbase": "500ms" } as CSSProperties}
       >
-        <span className={`${styles.blockIcon} ${iconClass}`}>
-          <Image src={icon} alt="" aria-hidden="true" />
+        <span className={`${styles.blockIcon} ${styles[iconClass]}`}>
+          {icon ? <Image src={icon} alt="" aria-hidden="true" /> : null}
         </span>
         <h4 className={styles.blockTitle}>
-          {title.split(" ").map((word, i) => (
-            <Fragment key={i}>
-              {i > 0 ? " " : null}
-              <span
-                className={styles.word}
-                style={{ "--wd": `${i * 50}ms` } as CSSProperties}
-              >
-                {word}
-              </span>
-            </Fragment>
-          ))}
+          <HeadingWords text={block.title} wordClass={styles.word} />
         </h4>
       </div>
       <p
@@ -78,13 +72,18 @@ function AboutBlock({ icon, iconClass, title, copy }: BlockProps) {
         className={styles.blockCopy}
         data-in={copyIn ? "true" : undefined}
       >
-        {copy}
+        {block.copy}
       </p>
     </div>
   );
 }
 
-export default function About() {
+export default function About({
+  heading,
+  blocks,
+  cta,
+  videoUrl,
+}: Pick<AboutBlock, "heading" | "blocks" | "cta" | "videoUrl">) {
   const [rowRef, rowIn] = useInView<HTMLDivElement>(0);
   const [h2Ref, h2In] = useInView<HTMLHeadingElement>(0.5);
   const [btnRef, btnIn] = useInView<HTMLSpanElement>(0);
@@ -105,75 +104,47 @@ export default function About() {
               className={styles.heading}
               data-in={h2In ? "true" : undefined}
             >
-              <span
-                className={`${styles.word} ${styles.hRed}`}
-                style={{ "--wd": "0ms" } as CSSProperties}
-              >
-                Experience
-              </span>
-              <br />
-              <span
-                className={styles.word}
-                style={{ "--wd": "50ms" } as CSSProperties}
-              >
-                Dynamic
-              </span>
-              <span
-                className={`${styles.word} ${styles.hRed}`}
-                style={{ "--wd": "100ms" } as CSSProperties}
-              >
-                &reg;
-              </span>{" "}
-              <span
-                className={styles.word}
-                style={{ "--wd": "150ms" } as CSSProperties}
-              >
-                Fitness
-              </span>
+              <HeadingWords
+                text={heading}
+                wordClass={styles.word}
+                accentClass={styles.hRed}
+                accentFirstLine
+              />
             </h2>
 
             <div className={styles.blocks}>
               <span className={styles.divider} aria-hidden="true" />
 
-              <AboutBlock
-                icon={iconDumbbellHeading}
-                iconClass={styles.icoDumbbellHead}
-                title="Who We Are"
-                copy="We’re a high-performance fitness club focused on building strength, endurance, and a strong community. Our goal is to create impactful training experiences for individuals at every stage."
-              />
+              {blocks?.map((block) => (
+                <Fragment key={block._key}>
+                  <AboutBlock block={block} />
+                  <span className={styles.divider} aria-hidden="true" />
+                </Fragment>
+              ))}
 
-              <span className={styles.divider} aria-hidden="true" />
-
-              <AboutBlock
-                icon={iconTarget}
-                iconClass={styles.icoTarget}
-                title="What Drives Us"
-                copy="We aim to support every member, from beginners to advanced athletes, in pushing their boundaries and achieving more than they thought possible."
-              />
-
-              <span className={styles.divider} aria-hidden="true" />
-
-              <span
-                ref={btnRef}
-                className={styles.btnSlot}
-                data-in={btnIn ? "true" : undefined}
-              >
-                <a href="/about" className={styles.btn}>
-                  <span className={styles.btnLabel}>
-                    <span className={styles.btnTrack}>
-                      <span>Learn More</span>
-                      <span aria-hidden="true">Learn More</span>
+              {cta ? (
+                <span
+                  ref={btnRef}
+                  className={styles.btnSlot}
+                  data-in={btnIn ? "true" : undefined}
+                >
+                  <a href={cta.href ?? "#"} className={styles.btn}>
+                    <span className={styles.btnLabel}>
+                      <span className={styles.btnTrack}>
+                        <span>{cta.label}</span>
+                        <span aria-hidden="true">{cta.label}</span>
+                      </span>
                     </span>
-                  </span>
-                </a>
-              </span>
+                  </a>
+                </span>
+              ) : null}
             </div>
           </div>
 
           <div className={styles.videoCol}>
             <video
               className={styles.video}
-              src="/about/about-video.webm"
+              src={videoUrl ?? undefined}
               autoPlay
               muted
               loop
