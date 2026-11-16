@@ -43,7 +43,7 @@ const linkGroups: FooterLinkGroup[] = [
   {
     titleKey: "footer.group.resources",
     links: [
-      // FitConnect partner app — same URL as the logo carousel (Hero/LogoScroll).
+      // FitConnect partner app.
       { labelKey: "footer.link.fitconnect", href: "https://fitconnect.me" },
       // Opening-hours popup (ScheduleModal).
       { labelKey: "footer.link.timeSchedule", action: "schedule" },
