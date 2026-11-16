@@ -10,7 +10,7 @@ import Image from "next/image";
  */
 
 const logos = [
-  { src: "/logos/fitconnect-logo.svg", alt: "FitConnect", url: "https://fitconnect.me" },
+  { src: "/logos/fitrobit-logo.png", alt: "FitRobit", url: "https://www.fitrobit.com" },
   { src: "/logos/nutrimax.avif", alt: "NutriMax", url: "https://nutrimaxsupplements.com/" },
 ];
 
